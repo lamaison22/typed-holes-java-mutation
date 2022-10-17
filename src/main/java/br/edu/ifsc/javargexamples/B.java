@@ -10,23 +10,19 @@ package br.edu.ifsc.javargexamples;
  * @author samuel
  */
 public class B {
-    
-    public int b;
-    
-    public B() {
-        
-    }
-    
-    public B(int b) {
-        this.b = b;
-    }
-    
-    public void setB(int b) {
-        this.b = b;
-    }
-    
-    public int getB() {
-        return b;
-    }
-    
+  public int b;
+
+  public B() {}
+
+  public B(int b) {
+    this.b = b;
+  }
+
+  public void setB(int b) {
+    this.b = b;
+  }
+
+  public int getB() {
+    return b;
+  }
 }

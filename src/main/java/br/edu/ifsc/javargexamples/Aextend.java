@@ -9,10 +9,9 @@ package br.edu.ifsc.javargexamples;
  *
  * @author lukra
  */
-public class Aextend extends A{
-    
-    public Aextend(int a1, int a2) {
-        super(a1, a2, true);
-    }
-    
+public class Aextend extends A {
+
+  public Aextend(int a1, int a2) {
+    super(a1, a2, true);
+  }
 }
