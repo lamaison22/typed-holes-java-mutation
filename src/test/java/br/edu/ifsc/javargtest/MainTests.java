@@ -119,7 +119,20 @@ public class MainTests {
     );
   }
 
-  //@Example
+  /**********************************
+   *                                *
+   *       Tests start here         *
+   *                                *
+   **********************************/
+
+  /*
+   *
+   * Generate a random primitive type all available primitive
+   * types can be found at JRGBase.java `primitiveTypes()` which
+   * then use 'net.jqwik.api.Arbitraries' to fetch all possible types
+   *
+   */
+  // @Example
   boolean checkGenPrimitiveType() {
     Arbitrary<PrimitiveType.Primitive> t = mBase.primitiveTypes();
 
@@ -134,7 +147,13 @@ public class MainTests {
     return true;
   }
 
-  //@Example
+  /*
+   *
+   * Generate a random String literal with min_length = 1
+   * and max_length = 5, ranging chars from 'a' to 'z'
+   *
+   */
+  // @Example
   boolean checkGenPrimitiveString() {
     Arbitrary<LiteralExpr> s = mBase.genPrimitiveString();
 
@@ -143,7 +162,12 @@ public class MainTests {
     return true;
   }
 
-  //@Example
+  /*
+   *
+   * Generate a new Class or Interface type from `JRGCore.java`
+   *
+   */
+  // @Example
   boolean checkGenObjectCreation() throws ClassNotFoundException {
     JRGLog.showMessage(
       Severity.MSG_XDEBUG,
@@ -171,7 +195,12 @@ public class MainTests {
     return true;
   }
 
-  //@Property(tries = 10)
+  /*
+   *
+   * Generate a random Method from `JRGCore.java` ClassTable
+   *
+   */
+  // @Property(tries = 10)
   boolean checkGenMethodInvokation() throws ClassNotFoundException {
     JRGLog.showMessage(
       Severity.MSG_XDEBUG,
@@ -204,7 +233,13 @@ public class MainTests {
     return true;
   }
 
-  //@Example
+  /*
+   *
+   * Picks a random Method from a list of avaiable methods
+   * from `JRGCore.java` using the given type "int" as a parameter
+   *
+   */
+  // @Example
   boolean checkGenCandidatesMethods() throws ClassNotFoundException {
     JRGLog.showMessage(
       Severity.MSG_XDEBUG,
@@ -223,7 +258,13 @@ public class MainTests {
     return true;
   }
 
-  //@Example
+  /*
+   *
+   * Picks a random Field/Attribute from a list of avaiable fields/attributes
+   * from `JRGCore.java` using the given type "int" as a parameter
+   *
+   */
+  // @Example
   boolean checkGenCandidatesFields() throws ClassNotFoundException {
     JRGLog.showMessage(
       Severity.MSG_XDEBUG,
@@ -242,7 +283,13 @@ public class MainTests {
     return true;
   }
 
-  //@Example
+  /*
+   *
+   * Picks a random Constructor from a list of avaiable constructors
+   * from `JRGCore.java` using the given type class as a parameter
+   *
+   */
+  // @Example
   boolean checkGenCandidatesConstructors() throws ClassNotFoundException {
     JRGLog.showMessage(
       Severity.MSG_XDEBUG,
@@ -263,7 +310,12 @@ public class MainTests {
     return true;
   }
 
-  //@Property(tries = 10)
+  /*
+   *
+   * Generate a selection of random expressions using attributes and literal integers
+   *
+   */
+  // @Property(tries = 10)
   boolean checkGenExpression() {
     JRGLog.showMessage(Severity.MSG_XDEBUG, "checkGenExpression::inicio");
 
@@ -283,7 +335,13 @@ public class MainTests {
     return true;
   }
 
-  //@Example
+  /*
+   *
+   * Generate a statement for accessing an attribute of type 'int'
+   * from `JRGCore.java` using 'tname: int' as parameter
+   *
+   */
+  // @Example
   boolean checkGenAttributeAccess() throws ClassNotFoundException {
     JRGLog.showMessage(
       Severity.MSG_XDEBUG,
@@ -302,7 +360,13 @@ public class MainTests {
     return true;
   }
 
-  //@Example
+  /*
+   *
+   * Generate a Cast expression for convertion
+   * from `JRGCore.java` using a Class as parameter
+   *
+   */
+  // @Example
   boolean checkGenUpCast() throws ClassNotFoundException {
     JRGLog.showMessage(Severity.MSG_XDEBUG, "checkGenUpCast" + "::inicio");
 
@@ -320,7 +384,12 @@ public class MainTests {
     return true;
   }
 
-  //@Example
+  /*
+   *
+   * !ERROR "Jwqik empty set of values"
+   *
+   */
+  // @Example
   boolean checkGenVar() throws ClassNotFoundException {
     JRGLog.showMessage(Severity.MSG_XDEBUG, "checkGenVar" + "::inicio");
 
@@ -335,7 +404,13 @@ public class MainTests {
     return true;
   }
 
-  //@Example
+  /*
+   *
+   * Get all super() from subsequents class inheritance calls
+   * from ClassTable given a Class path as a parameter
+   *
+   */
+  // @Example
   boolean checkSuperTypes() throws ClassNotFoundException {
     JRGLog.showMessage(Severity.MSG_XDEBUG, "checkSuperTypes" + "::inicio");
 
@@ -354,7 +429,13 @@ public class MainTests {
     return true;
   }
 
-  //@Example
+  /*
+   *
+   * Get the subTypes from a given class object
+   * from ClassTable given a Class path as a parameter
+   *
+   */
+  // @Example
   boolean checkSubTypes() throws ClassNotFoundException {
     JRGLog.showMessage(Severity.MSG_XDEBUG, "checkSubTypes" + "::inicio");
 
@@ -371,7 +452,15 @@ public class MainTests {
     return true;
   }
 
-  //@Example
+  /*
+   *
+   * Get all superTypes from subsequent class calls
+   * from ClassTable given a Class path as a parameter
+   *
+   * In fact, should be called `checkSuperTypes()`
+   *
+   */
+  // @Example
   boolean checkSubTypes2() throws ClassNotFoundException {
     JRGLog.showMessage(Severity.MSG_XDEBUG, "checkSubTypes" + "::inicio");
 
@@ -388,7 +477,13 @@ public class MainTests {
     return true;
   }
 
-  //@Example
+  /*
+   *
+   * Get the candidates for up-casting
+   * from `JRGCore.java` using the class object as a parameter
+   *
+   */
+  // @Example
   boolean checkGenCandidateUpCast() throws ClassNotFoundException {
     JRGLog.showMessage(
       Severity.MSG_XDEBUG,
@@ -409,7 +504,17 @@ public class MainTests {
     return true;
   }
 
-  @Example
+  /*
+   *
+   * Generate a BlockStmt containing a random program
+   * from `JRGStmt.java` using the imports from `MainClass.java`
+   * the code is generated from a list variables up to conditional statements
+   *
+   * # A further improvement would be to write this BlockStmt to a file instead
+   * of writing to console everytime the test is ran
+   *
+   */
+  // @Example
   boolean checkGenBlockStmt() throws ClassNotFoundException, IOException {
     JRGLog.showMessage(Severity.MSG_XDEBUG, "checkGenBlockStmt::inicio");
 
@@ -436,7 +541,14 @@ public class MainTests {
     return true;
   }
 
-  //@Property(tries = 100)
+  /*
+   *
+   * Generate a variety of variable declarations and assignments
+   * using arbitrary data types and a valid string for the variable
+   * label from `JRGStmt.java`
+   *
+   */
+  // @Property(tries = 100)
   boolean checkGenVarDeclAssign() throws ClassNotFoundException {
     JRGLog.showMessage(Severity.MSG_XDEBUG, "checkGenVarDeclaration::inicio");
 
@@ -449,7 +561,13 @@ public class MainTests {
     return true;
   }
 
-  //@Property(tries = 100)
+  /*
+   *
+   * Generate a variety of ONLY variable declarations using arbitrary
+   * data types and a valid string for the variable label from `JRGStmt.java`
+   *
+   */
+  // @Property(tries = 100)
   boolean checkGenVarDecl() throws ClassNotFoundException {
     JRGLog.showMessage(Severity.MSG_XDEBUG, "checkGenVarDeclaration::inicio");
 
@@ -462,7 +580,12 @@ public class MainTests {
     return true;
   }
 
-  //@Example
+  /*
+   * 
+   * Generate If and Else statements from `JRGStmt.java`
+   * 
+   */
+  // @Example
   boolean checkGenIfStmt() throws ClassNotFoundException {
     JRGLog.showMessage(Severity.MSG_XDEBUG, "checkGenIfStmt::inicio");
 
@@ -475,7 +598,13 @@ public class MainTests {
     return true;
   }
 
-  //@Example
+  /*
+   * 
+   * !ERROR - It's using a binaryExpr and looping conditional for some reason
+   * Idk if it is supposed to be like this
+   * 
+   */
+  // @Example
   boolean checkWhileStmt() {
     JRGLog.showMessage(Severity.MSG_XDEBUG, "checkWhileStmt::inicio");
 
@@ -488,7 +617,13 @@ public class MainTests {
     return true;
   }
 
-  //@Example
+  /*
+   * 
+   * Generate conditional statements and a MainClass as well as functions
+   * inside it with statements within itself from `JRGStmt.java`
+   * 
+   */
+  // @Example
   boolean checkGenStatement() throws ClassNotFoundException, IOException {
     JRGLog.showMessage(Severity.MSG_XDEBUG, "checkGenStatement::inicio");
 
@@ -518,7 +653,12 @@ public class MainTests {
     return true;
   }
 
-  //@Example
+  /*
+   * 
+   * Generate a Logical statement from `JRGStmt.java`
+   * 
+   */
+  // @Example
   boolean checkGenExpressionStmt() {
     JRGLog.showMessage(Severity.MSG_XDEBUG, "checkGenExpressionStmt::inicio");
 
@@ -657,7 +797,7 @@ public class MainTests {
     return true;
   }
 
-  //@Example
+  // @Example
   boolean checkGenList() throws ClassNotFoundException {
     JRGLog.showMessage(Severity.MSG_XDEBUG, "checkGenTypeAssingStmt::inicio");
 

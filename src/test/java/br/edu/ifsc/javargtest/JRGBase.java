@@ -34,10 +34,6 @@ public class JRGBase {
     mCT = ct;
   }
 
-  /*public   RandomTypes() {
-    
-    }*/
-
   @Provide
   public Arbitrary<ClassOrInterfaceType> classOrInterfaceTypes()
     throws ClassNotFoundException {
