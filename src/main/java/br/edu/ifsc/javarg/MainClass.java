@@ -6,6 +6,11 @@ import br.edu.ifsc.javargexamples.AextendExtend;
 import br.edu.ifsc.javargexamples.B;
 import br.edu.ifsc.javargexamples.C;
 
+/**
+ *
+ * @author unknown
+ *
+ */
 @SuppressWarnings("all")
 public class MainClass {
 

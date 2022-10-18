@@ -8,6 +8,7 @@ package br.edu.ifsc.javargtest;
 /**
  *
  * @author samuel
+ * 
  */
 public class JRGLog {
 

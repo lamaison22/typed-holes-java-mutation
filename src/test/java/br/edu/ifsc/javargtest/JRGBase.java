@@ -26,6 +26,7 @@ import net.jqwik.api.Provide;
 /**
  *
  * @author lukra
+ * 
  */
 public class JRGBase {
   private ClassTable mCT;

@@ -28,6 +28,11 @@ import net.jqwik.api.Arbitraries;
 import net.jqwik.api.Arbitrary;
 import net.jqwik.api.Provide;
 
+/**
+ * 
+ * @author unknown
+ * 
+ */
 public class JRGStmt {
   private ClassTable mCT;
 
@@ -443,7 +448,7 @@ public class JRGStmt {
     }
 
     for (int i = 0; i < 100; i++) {
-      System.out.println("Posisão" + a.get(i));
+      System.out.println("Posisão: " + a.get(i));
     }
 
     JRGLog.showMessage(JRGLog.Severity.MSG_XDEBUG, "genVarDeclarator::fim");

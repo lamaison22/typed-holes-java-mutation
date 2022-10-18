@@ -30,6 +30,7 @@ import net.jqwik.api.Provide;
 /**
  *
  * @author lukra
+ * 
  */
 public class JRGCore {
   private static final int FUEL_START = 10;

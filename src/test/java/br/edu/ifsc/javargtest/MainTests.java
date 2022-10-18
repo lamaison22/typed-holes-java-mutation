@@ -27,6 +27,7 @@ import org.junit.Test;
 /**
  *
  * @author samuel
+ * 
  */
 public class MainTests {
   private static final String SKELETON_PATH =
@@ -84,6 +85,12 @@ public class MainTests {
     return list;
   }
 
+  /*
+   * 
+   * Write AST - Arbitrary Sintax Tree to file
+   * using FileWriter output filename is `ast.dot`
+   * 
+   */
   private void dumpAST() throws IOException {
     DotPrinter printer = new DotPrinter(true);
 
@@ -581,9 +588,9 @@ public class MainTests {
   }
 
   /*
-   * 
+   *
    * Generate If and Else statements from `JRGStmt.java`
-   * 
+   *
    */
   // @Example
   boolean checkGenIfStmt() throws ClassNotFoundException {
@@ -599,10 +606,10 @@ public class MainTests {
   }
 
   /*
-   * 
+   *
    * !ERROR - It's using a binaryExpr and looping conditional for some reason
    * Idk if it is supposed to be like this
-   * 
+   *
    */
   // @Example
   boolean checkWhileStmt() {
@@ -618,10 +625,10 @@ public class MainTests {
   }
 
   /*
-   * 
+   *
    * Generate conditional statements and a MainClass as well as functions
    * inside it with statements within itself from `JRGStmt.java`
-   * 
+   *
    */
   // @Example
   boolean checkGenStatement() throws ClassNotFoundException, IOException {
@@ -654,9 +661,9 @@ public class MainTests {
   }
 
   /*
-   * 
+   *
    * Generate a Logical statement from `JRGStmt.java`
-   * 
+   *
    */
   // @Example
   boolean checkGenExpressionStmt() {
@@ -671,8 +678,13 @@ public class MainTests {
     return true;
   }
 
-  //@Example
-  //@Property(tries = 10)
+  /*
+   *
+   * Generate a Logical Expressions from `JRGOperator.java`
+   *
+   */
+  // @Example
+  // @Property(tries = 10)
   boolean checkGenLogiExpression() {
     JRGLog.showMessage(Severity.MSG_XDEBUG, "checkGenLogiExpression::inicio");
 
@@ -685,8 +697,14 @@ public class MainTests {
     return true;
   }
 
-  //@Example
-  //@Property(tries = 10)
+  /*
+   *
+   * Generate a Relational Expressions from `JRGOperator.java`
+   * Using comparision signs as <, ==, >= for example
+   *
+   */
+  // @Example
+  // @Property(tries = 10)
   boolean checkGenRelaExpression() {
     JRGLog.showMessage(Severity.MSG_XDEBUG, "checkGenRelaExpression::inicio");
 
@@ -699,8 +717,14 @@ public class MainTests {
     return true;
   }
 
-  //@Example
-  //@Property(tries = 1000)
+    /*
+   *
+   * Generate a Arithmetic Expressions from `JRGOperator.java`
+   * Using %, ==, +, -, * between two or more statements for example
+   *
+   */
+  // @Example
+  // @Property(tries = 10)
   boolean checkGenArithExpression() {
     JRGLog.showMessage(Severity.MSG_XDEBUG, "checkGenArithExpression::inicio");
 
@@ -716,7 +740,12 @@ public class MainTests {
     return true;
   }
 
-  //@Example
+  /*
+   * 
+   * Generate statements in a array format from `JRGStmt.java`
+   * 
+   */
+  // @Example
   boolean checkGenStatementList() {
     JRGLog.showMessage(Severity.MSG_XDEBUG, "checkGenStatementList::inicio");
 
@@ -729,7 +758,13 @@ public class MainTests {
     return true;
   }
 
-  //@Property
+  /*
+   * 
+   * Generate statements for variable declaration
+   * From `JRGStmt.java`
+   * 
+   */
+  // @Property(tries = 10)
   boolean checkGenVarDeclarationStmt() throws ClassNotFoundException {
     JRGLog.showMessage(
       Severity.MSG_XDEBUG,
@@ -745,7 +780,12 @@ public class MainTests {
     return true;
   }
 
-  //@Example
+  /*
+   * 
+   * !ERROR - empty set of values
+   * 
+   */
+  // @Example
   boolean checkGenVarAssingStmt() throws ClassNotFoundException {
     JRGLog.showMessage(Severity.MSG_XDEBUG, "checkGenVarAssingStmt::inicio");
 
@@ -758,7 +798,13 @@ public class MainTests {
     return true;
   }
 
-  //@Example
+  /*
+   * 
+   * Generate Lambda expressions from `JRGCore.java`
+   * 
+   */
+  // @Example
+  // @Property(tries = 10)
   boolean checkGenLambdaExpr() throws ClassNotFoundException {
     JRGLog.showMessage(Severity.MSG_XDEBUG, "checkGenLambdaExpr::inicio");
 
@@ -771,7 +817,12 @@ public class MainTests {
     return true;
   }
 
-  //@Example
+  /*
+   * 
+   * !ERROR - empty set of values
+   * 
+   */
+  // @Example
   boolean checkGenTypeAssingStmt() throws ClassNotFoundException {
     JRGLog.showMessage(Severity.MSG_XDEBUG, "checkGenTypeAssingStmt::inicio");
 
@@ -784,7 +835,14 @@ public class MainTests {
     return true;
   }
 
-  //@Example
+  /*
+   * 
+   * Generate For Loopings expressions with statements within
+   * the loop using `JRGStmt.java`
+   * 
+   */
+  // @Example
+  // @Property(tries=4)
   boolean checkGenFor() throws ClassNotFoundException {
     JRGLog.showMessage(Severity.MSG_XDEBUG, "checkGenTypeAssingStmt::inicio");
 
@@ -797,6 +855,11 @@ public class MainTests {
     return true;
   }
 
+  /*
+   * 
+   * !IDK = Generate a selection of variable declarations and assignments
+   * 
+   */
   // @Example
   boolean checkGenList() throws ClassNotFoundException {
     JRGLog.showMessage(Severity.MSG_XDEBUG, "checkGenTypeAssingStmt::inicio");

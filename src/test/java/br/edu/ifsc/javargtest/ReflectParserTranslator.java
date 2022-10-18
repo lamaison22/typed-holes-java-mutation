@@ -12,6 +12,7 @@ import com.github.javaparser.ast.type.Type;
 /**
  *
  * @author samuel
+ * 
  */
 public class ReflectParserTranslator {
 

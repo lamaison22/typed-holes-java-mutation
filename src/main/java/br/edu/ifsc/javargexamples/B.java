@@ -8,6 +8,7 @@ package br.edu.ifsc.javargexamples;
 /**
  *
  * @author samuel
+ * 
  */
 public class B {
   public int b;

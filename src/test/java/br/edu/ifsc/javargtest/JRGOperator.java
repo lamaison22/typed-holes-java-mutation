@@ -13,6 +13,11 @@ import net.jqwik.api.Arbitraries;
 import net.jqwik.api.Arbitrary;
 import net.jqwik.api.Provide;
 
+/**
+ * 
+ * @author unknown
+ * 
+ */
 public class JRGOperator {
   private ClassTable mCT;
 

@@ -8,6 +8,7 @@ package br.edu.ifsc.javargexamples;
 /**
  *
  * @author lukra
+ * 
  */
 public class AextendExtend extends Aextend {
 
