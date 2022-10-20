@@ -8,13 +8,13 @@ package br.edu.ifsc.javargexamples;
 /**
  *
  * @author samuel
+ * 
  */
 public class C {
-    
-   // public A aInC;
-    //public B bInC;
-    
-    /*  public C(A a, B b) {
+  // public A aInC;
+  //public B bInC;
+
+  /*  public C(A a, B b) {
     aInC = a;
     bInC = b;
     }
