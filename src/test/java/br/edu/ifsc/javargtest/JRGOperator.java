@@ -5,6 +5,7 @@ import com.github.javaparser.ast.expr.BinaryExpr;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.IntegerLiteralExpr;
 import com.github.javaparser.ast.expr.LiteralExpr;
+import com.github.javaparser.ast.expr.UnaryExpr;
 import com.github.javaparser.ast.expr.VariableDeclarationExpr;
 import com.github.javaparser.ast.type.PrimitiveType;
 import com.github.javaparser.ast.type.Type;
@@ -55,7 +56,6 @@ public class JRGOperator {
     Map<String, String> ctx,
     Type t
   ) {
-    //String tp = t.asString();
 
     Arbitrary<Expression> e = mCore.genExpression(
       ctx,
@@ -96,29 +96,20 @@ public class JRGOperator {
     );
   }
 
-  @Provide
-  public Arbitrary<BinaryExpr> genArithBooleanFor(
-    Map<String, String> ctx,
-    VariableDeclarator var,
-    Arbitrary<LiteralExpr> ex
-  ) {
-    Arbitrary<PrimitiveType.Primitive> t = mBase.primitiveTypesMatematicos();
-    String tp = t.sample().toString();
+    @Provide
+    public Arbitrary<UnaryExpr> genArithBooleanFor(
+            Map<String,String> ctx, 
+            VariableDeclarator var, 
+            Arbitrary<LiteralExpr> ex
+    ) {
+         Arbitrary<PrimitiveType.Primitive> t = mBase.primitiveTypesMatematicos();
+        String tp = t.sample().toString();
+        
+        Arbitrary<Expression> e = mCore.genExpression(ctx, ReflectParserTranslator.reflectToParserType(tp));   
+                 
+        return e.map(exp -> new UnaryExpr(var.getNameAsExpression(), genArithOperatorFor().sample()));
 
-    Arbitrary<Expression> e = mCore.genExpression(
-      ctx,
-      ReflectParserTranslator.reflectToParserType(tp)
-    );
-
-    return e.map(
-      exp ->
-        new BinaryExpr(
-          var.getNameAsExpression(),
-          ex.sample(),
-          genArithOperatorFor().sample()
-        )
-    );
-  }
+    }
 
   @Provide
   public Arbitrary<BinaryExpr> genRelaExpression(Map<String, String> ctx) {
@@ -190,10 +181,7 @@ public class JRGOperator {
     );
   }
 
-  public Arbitrary<BinaryExpr.Operator> genArithOperatorFor() {
-    return Arbitraries.of(
-      BinaryExpr.Operator.PLUS,
-      BinaryExpr.Operator.MULTIPLY
-    );
+  public Arbitrary<UnaryExpr.Operator> genArithOperatorFor() {
+          return Arbitraries.of(UnaryExpr.Operator.POSTFIX_INCREMENT );
   }
 }
