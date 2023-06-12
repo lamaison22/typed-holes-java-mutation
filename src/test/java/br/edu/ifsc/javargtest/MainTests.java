@@ -1,5 +1,6 @@
 package br.edu.ifsc.javargtest;
 
+import br.edu.ifsc.javargexamples.Aextend;
 import br.edu.ifsc.javargtest.JRGLog.Severity;
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.*;
@@ -19,6 +20,7 @@ import java.io.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.math.BigInteger;
 import java.util.*;
 import net.jqwik.api.*;
 import net.jqwik.api.lifecycle.BeforeTry;
@@ -207,7 +209,8 @@ public class MainTests {
    * Generate a random Method from `JRGCore.java` ClassTable
    *
    */
-  // @Property(tries = 10)
+  
+   @Property(tries = 10)
   boolean checkGenMethodInvokation() throws ClassNotFoundException {
     JRGLog.showMessage(
       Severity.MSG_XDEBUG,
@@ -246,7 +249,9 @@ public class MainTests {
    * from `JRGCore.java` using the given type "int" as a parameter
    *
    */
-  // @Example
+  //  @Example
+  @Property(tries=4)
+
   boolean checkGenCandidatesMethods() throws ClassNotFoundException {
     JRGLog.showMessage(
       Severity.MSG_XDEBUG,
@@ -297,17 +302,26 @@ public class MainTests {
    *
    */
   // @Example
-  boolean checkGenCandidatesConstructors() throws ClassNotFoundException {
+  @Property(tries=10)
+  boolean checkGenCandidatesConstructors()throws ClassNotFoundException {
     JRGLog.showMessage(
       Severity.MSG_XDEBUG,
       "checkGenCandidatesConstructors" + "::inicio"
     );
-
+    
+  
     Arbitrary<Constructor> b = mCore.genCandidatesConstructors(
+      "br.edu." + "ifsc.javargexamples.A"
+    );
+      Arbitrary<Constructor> c = mCore.genCandidatesConstructors(
       "br.edu." + "ifsc.javargexamples.B"
     );
 
     System.out.println("Candidatos Constructors: " + b.sample());
+    System.out.println("Candidatos Constructors: " + c.sample());
+   
+     
+
 
     JRGLog.showMessage(
       Severity.MSG_XDEBUG,
@@ -322,7 +336,7 @@ public class MainTests {
    * Generate a selection of random expressions using attributes and literal integers
    *
    */
-  // @Property(tries = 10)
+   @Property(tries = 5)
   boolean checkGenExpression() {
     JRGLog.showMessage(Severity.MSG_XDEBUG, "checkGenExpression::inicio");
 
@@ -348,7 +362,7 @@ public class MainTests {
    * from `JRGCore.java` using 'tname: int' as parameter
    *
    */
-  // @Example
+   @Example
   boolean checkGenAttributeAccess() throws ClassNotFoundException {
     JRGLog.showMessage(
       Severity.MSG_XDEBUG,
@@ -397,6 +411,7 @@ public class MainTests {
    *
    */
   // @Example
+  @Property(tries = 10)
   boolean checkGenVar() throws ClassNotFoundException {
     JRGLog.showMessage(Severity.MSG_XDEBUG, "checkGenVar" + "::inicio");
 
@@ -724,8 +739,17 @@ public class MainTests {
    *
    */
   // @Example
-  // @Property(tries = 10)
+   @Property(tries = 10)
+
+   //uma binary expr é um expr que tem um argumento um operador no meio e outro argumento : Ex 14 % 12 ou newblablabla.A.getA1() + 1442
+
+   // estamos trabalhando com Strings creio eu nao estão sendo executadas então
+   //nao posso pegar o resultado dessas operações, nao sei
+
+
+   // oq q eu quero substituir?..
   boolean checkGenArithExpression() {
+  
     JRGLog.showMessage(Severity.MSG_XDEBUG, "checkGenArithExpression::inicio");
 
     Arbitrary<BinaryExpr> e = mOperator.genArithExpression(
@@ -734,6 +758,7 @@ public class MainTests {
     );
 
     System.out.println("checkGenArithExpression: " + e.sample());
+  
 
     JRGLog.showMessage(Severity.MSG_XDEBUG, "checkGenArithExpression::fim");
 
@@ -804,7 +829,7 @@ public class MainTests {
    * 
    */
   // @Example
-  // @Property(tries = 10)
+   @Property(tries = 10)
   boolean checkGenLambdaExpr() throws ClassNotFoundException {
     JRGLog.showMessage(Severity.MSG_XDEBUG, "checkGenLambdaExpr::inicio");
 
@@ -813,7 +838,6 @@ public class MainTests {
     System.out.println("checkGenLambdaExpr: " + e.sample());
 
     JRGLog.showMessage(Severity.MSG_XDEBUG, "checkGenLambdaExpr::fim");
-
     return true;
   }
 

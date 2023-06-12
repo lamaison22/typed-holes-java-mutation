@@ -1,66 +1,68 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" name="MainTests" time="0.695" tests="1" errors="0" skipped="0" failures="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" name="MainTests" time="0.556" tests="1" errors="0" skipped="0" failures="0">
   <properties>
-    <property name="sun.desktop" value="gnome"/>
-    <property name="awt.toolkit" value="sun.awt.X11.XToolkit"/>
-    <property name="java.specification.version" value="11"/>
-    <property name="sun.cpu.isalist" value=""/>
-    <property name="sun.jnu.encoding" value="UTF-8"/>
-    <property name="java.class.path" value="/home/attory/Documents/Github/java-gen/target/test-classes:/home/attory/Documents/Github/java-gen/target/classes:/home/attory/.m2/repository/com/github/javaparser/javaparser-symbol-solver-core/3.24.4/javaparser-symbol-solver-core-3.24.4.jar:/home/attory/.m2/repository/com/github/javaparser/javaparser-core/3.24.4/javaparser-core-3.24.4.jar:/home/attory/.m2/repository/org/javassist/javassist/3.29.0-GA/javassist-3.29.0-GA.jar:/home/attory/.m2/repository/com/google/guava/guava/31.1-jre/guava-31.1-jre.jar:/home/attory/.m2/repository/com/google/guava/failureaccess/1.0.1/failureaccess-1.0.1.jar:/home/attory/.m2/repository/com/google/guava/listenablefuture/9999.0-empty-to-avoid-conflict-with-guava/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar:/home/attory/.m2/repository/com/google/code/findbugs/jsr305/3.0.2/jsr305-3.0.2.jar:/home/attory/.m2/repository/org/checkerframework/checker-qual/3.12.0/checker-qual-3.12.0.jar:/home/attory/.m2/repository/com/google/errorprone/error_prone_annotations/2.11.0/error_prone_annotations-2.11.0.jar:/home/attory/.m2/repository/com/google/j2objc/j2objc-annotations/1.3/j2objc-annotations-1.3.jar:/home/attory/.m2/repository/net/jqwik/jqwik/1.3.5/jqwik-1.3.5.jar:/home/attory/.m2/repository/org/apiguardian/apiguardian-api/1.1.0/apiguardian-api-1.1.0.jar:/home/attory/.m2/repository/net/jqwik/jqwik-api/1.3.5/jqwik-api-1.3.5.jar:/home/attory/.m2/repository/org/opentest4j/opentest4j/1.2.0/opentest4j-1.2.0.jar:/home/attory/.m2/repository/org/junit/platform/junit-platform-commons/1.6.2/junit-platform-commons-1.6.2.jar:/home/attory/.m2/repository/net/jqwik/jqwik-engine/1.3.5/jqwik-engine-1.3.5.jar:/home/attory/.m2/repository/org/junit/platform/junit-platform-engine/1.6.2/junit-platform-engine-1.6.2.jar:/home/attory/.m2/repository/org/assertj/assertj-core/3.17.2/assertj-core-3.17.2.jar:/home/attory/.m2/repository/junit/junit/4.12/junit-4.12.jar:/home/attory/.m2/repository/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar:"/>
-    <property name="java.vm.vendor" value="Flathub"/>
+    <property name="jpda.address" value="49872"/>
+    <property name="java.specification.version" value="20"/>
+    <property name="sun.cpu.isalist" value="amd64"/>
+    <property name="sun.jnu.encoding" value="Cp1252"/>
+    <property name="java.class.path" value="C:\Users\joao_\OneDrive\Documentos\GitHub\java-gen\target\test-classes;C:\Users\joao_\OneDrive\Documentos\GitHub\java-gen\target\classes;C:\Users\joao_\.m2\repository\com\github\javaparser\javaparser-symbol-solver-core\3.25.2\javaparser-symbol-solver-core-3.25.2.jar;C:\Users\joao_\.m2\repository\com\github\javaparser\javaparser-core\3.25.2\javaparser-core-3.25.2.jar;C:\Users\joao_\.m2\repository\org\javassist\javassist\3.29.2-GA\javassist-3.29.2-GA.jar;C:\Users\joao_\.m2\repository\com\google\guava\guava\31.1-jre\guava-31.1-jre.jar;C:\Users\joao_\.m2\repository\com\google\guava\failureaccess\1.0.1\failureaccess-1.0.1.jar;C:\Users\joao_\.m2\repository\com\google\guava\listenablefuture\9999.0-empty-to-avoid-conflict-with-guava\listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar;C:\Users\joao_\.m2\repository\com\google\code\findbugs\jsr305\3.0.2\jsr305-3.0.2.jar;C:\Users\joao_\.m2\repository\org\checkerframework\checker-qual\3.12.0\checker-qual-3.12.0.jar;C:\Users\joao_\.m2\repository\com\google\errorprone\error_prone_annotations\2.11.0\error_prone_annotations-2.11.0.jar;C:\Users\joao_\.m2\repository\com\google\j2objc\j2objc-annotations\1.3\j2objc-annotations-1.3.jar;C:\Users\joao_\.m2\repository\net\jqwik\jqwik\1.3.5\jqwik-1.3.5.jar;C:\Users\joao_\.m2\repository\org\apiguardian\apiguardian-api\1.1.0\apiguardian-api-1.1.0.jar;C:\Users\joao_\.m2\repository\net\jqwik\jqwik-api\1.3.5\jqwik-api-1.3.5.jar;C:\Users\joao_\.m2\repository\org\opentest4j\opentest4j\1.2.0\opentest4j-1.2.0.jar;C:\Users\joao_\.m2\repository\org\junit\platform\junit-platform-commons\1.6.2\junit-platform-commons-1.6.2.jar;C:\Users\joao_\.m2\repository\net\jqwik\jqwik-engine\1.3.5\jqwik-engine-1.3.5.jar;C:\Users\joao_\.m2\repository\org\junit\platform\junit-platform-engine\1.6.2\junit-platform-engine-1.6.2.jar;C:\Users\joao_\.m2\repository\org\assertj\assertj-core\3.17.2\assertj-core-3.17.2.jar;C:\Users\joao_\.m2\repository\junit\junit\4.12\junit-4.12.jar;C:\Users\joao_\.m2\repository\org\hamcrest\hamcrest-core\1.3\hamcrest-core-1.3.jar;"/>
+    <property name="java.vm.vendor" value="Oracle Corporation"/>
     <property name="sun.arch.data.model" value="64"/>
-    <property name="java.vendor.url" value="https://flathub.org"/>
+    <property name="user.variant" value=""/>
+    <property name="java.vendor.url" value="https://java.oracle.com/"/>
     <property name="user.timezone" value="America/Sao_Paulo"/>
-    <property name="user.country.format" value="BR"/>
-    <property name="java.vm.specification.version" value="11"/>
-    <property name="os.name" value="Linux"/>
-    <property name="user.country" value="US"/>
+    <property name="forkMode" value="once"/>
+    <property name="os.name" value="Windows 10"/>
+    <property name="java.vm.specification.version" value="20"/>
+    <property name="user.country" value="BR"/>
     <property name="sun.java.launcher" value="SUN_STANDARD"/>
-    <property name="sun.boot.library.path" value="/app/jdk/lib"/>
-    <property name="sun.java.command" value="/home/attory/Documents/Github/java-gen/target/surefire/surefirebooter15107642236090279134.jar /home/attory/Documents/Github/java-gen/target/surefire 2022-10-18T11-01-47_966-jvmRun1 surefire9890800073113871973tmp surefire_06695185167144160665tmp"/>
+    <property name="sun.boot.library.path" value="C:\Program Files\Java\jdk-20\bin"/>
+    <property name="sun.java.command" value="C:\Users\joao_\AppData\Local\Temp\surefire3163389907786216534\surefirebooter333542878316881617.jar C:\Users\joao_\AppData\Local\Temp\surefire3163389907786216534 2023-04-26T21-25-31_164-jvmRun1 surefire10505309537492709684tmp surefire_016985698445849461062tmp"/>
     <property name="jdk.debug" value="release"/>
-    <property name="test" value="br.edu.ifsc.javargtest.MainTests"/>
-    <property name="surefire.test.class.path" value="/home/attory/Documents/Github/java-gen/target/test-classes:/home/attory/Documents/Github/java-gen/target/classes:/home/attory/.m2/repository/com/github/javaparser/javaparser-symbol-solver-core/3.24.4/javaparser-symbol-solver-core-3.24.4.jar:/home/attory/.m2/repository/com/github/javaparser/javaparser-core/3.24.4/javaparser-core-3.24.4.jar:/home/attory/.m2/repository/org/javassist/javassist/3.29.0-GA/javassist-3.29.0-GA.jar:/home/attory/.m2/repository/com/google/guava/guava/31.1-jre/guava-31.1-jre.jar:/home/attory/.m2/repository/com/google/guava/failureaccess/1.0.1/failureaccess-1.0.1.jar:/home/attory/.m2/repository/com/google/guava/listenablefuture/9999.0-empty-to-avoid-conflict-with-guava/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar:/home/attory/.m2/repository/com/google/code/findbugs/jsr305/3.0.2/jsr305-3.0.2.jar:/home/attory/.m2/repository/org/checkerframework/checker-qual/3.12.0/checker-qual-3.12.0.jar:/home/attory/.m2/repository/com/google/errorprone/error_prone_annotations/2.11.0/error_prone_annotations-2.11.0.jar:/home/attory/.m2/repository/com/google/j2objc/j2objc-annotations/1.3/j2objc-annotations-1.3.jar:/home/attory/.m2/repository/net/jqwik/jqwik/1.3.5/jqwik-1.3.5.jar:/home/attory/.m2/repository/org/apiguardian/apiguardian-api/1.1.0/apiguardian-api-1.1.0.jar:/home/attory/.m2/repository/net/jqwik/jqwik-api/1.3.5/jqwik-api-1.3.5.jar:/home/attory/.m2/repository/org/opentest4j/opentest4j/1.2.0/opentest4j-1.2.0.jar:/home/attory/.m2/repository/org/junit/platform/junit-platform-commons/1.6.2/junit-platform-commons-1.6.2.jar:/home/attory/.m2/repository/net/jqwik/jqwik-engine/1.3.5/jqwik-engine-1.3.5.jar:/home/attory/.m2/repository/org/junit/platform/junit-platform-engine/1.6.2/junit-platform-engine-1.6.2.jar:/home/attory/.m2/repository/org/assertj/assertj-core/3.17.2/assertj-core-3.17.2.jar:/home/attory/.m2/repository/junit/junit/4.12/junit-4.12.jar:/home/attory/.m2/repository/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar:"/>
+    <property name="test" value="br.edu.ifsc.javargtest.MainTests#checkGenAttributeAccess"/>
+    <property name="surefire.test.class.path" value="C:\Users\joao_\OneDrive\Documentos\GitHub\java-gen\target\test-classes;C:\Users\joao_\OneDrive\Documentos\GitHub\java-gen\target\classes;C:\Users\joao_\.m2\repository\com\github\javaparser\javaparser-symbol-solver-core\3.25.2\javaparser-symbol-solver-core-3.25.2.jar;C:\Users\joao_\.m2\repository\com\github\javaparser\javaparser-core\3.25.2\javaparser-core-3.25.2.jar;C:\Users\joao_\.m2\repository\org\javassist\javassist\3.29.2-GA\javassist-3.29.2-GA.jar;C:\Users\joao_\.m2\repository\com\google\guava\guava\31.1-jre\guava-31.1-jre.jar;C:\Users\joao_\.m2\repository\com\google\guava\failureaccess\1.0.1\failureaccess-1.0.1.jar;C:\Users\joao_\.m2\repository\com\google\guava\listenablefuture\9999.0-empty-to-avoid-conflict-with-guava\listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar;C:\Users\joao_\.m2\repository\com\google\code\findbugs\jsr305\3.0.2\jsr305-3.0.2.jar;C:\Users\joao_\.m2\repository\org\checkerframework\checker-qual\3.12.0\checker-qual-3.12.0.jar;C:\Users\joao_\.m2\repository\com\google\errorprone\error_prone_annotations\2.11.0\error_prone_annotations-2.11.0.jar;C:\Users\joao_\.m2\repository\com\google\j2objc\j2objc-annotations\1.3\j2objc-annotations-1.3.jar;C:\Users\joao_\.m2\repository\net\jqwik\jqwik\1.3.5\jqwik-1.3.5.jar;C:\Users\joao_\.m2\repository\org\apiguardian\apiguardian-api\1.1.0\apiguardian-api-1.1.0.jar;C:\Users\joao_\.m2\repository\net\jqwik\jqwik-api\1.3.5\jqwik-api-1.3.5.jar;C:\Users\joao_\.m2\repository\org\opentest4j\opentest4j\1.2.0\opentest4j-1.2.0.jar;C:\Users\joao_\.m2\repository\org\junit\platform\junit-platform-commons\1.6.2\junit-platform-commons-1.6.2.jar;C:\Users\joao_\.m2\repository\net\jqwik\jqwik-engine\1.3.5\jqwik-engine-1.3.5.jar;C:\Users\joao_\.m2\repository\org\junit\platform\junit-platform-engine\1.6.2\junit-platform-engine-1.6.2.jar;C:\Users\joao_\.m2\repository\org\assertj\assertj-core\3.17.2\assertj-core-3.17.2.jar;C:\Users\joao_\.m2\repository\junit\junit\4.12\junit-4.12.jar;C:\Users\joao_\.m2\repository\org\hamcrest\hamcrest-core\1.3\hamcrest-core-1.3.jar;"/>
     <property name="sun.cpu.endian" value="little"/>
-    <property name="user.home" value="/home/attory"/>
-    <property name="user.language" value="en"/>
+    <property name="user.home" value="C:\Users\joao_"/>
+    <property name="user.language" value="pt"/>
     <property name="java.specification.vendor" value="Oracle Corporation"/>
-    <property name="java.version.date" value="2022-01-18"/>
-    <property name="java.home" value="/app/jdk"/>
-    <property name="file.separator" value="/"/>
-    <property name="basedir" value="/home/attory/Documents/Github/java-gen"/>
-    <property name="java.vm.compressedOopsMode" value="32-bit"/>
+    <property name="java.version.date" value="2023-03-21"/>
+    <property name="java.home" value="C:\Program Files\Java\jdk-20"/>
+    <property name="file.separator" value="\"/>
+    <property name="basedir" value="C:\Users\joao_\OneDrive\Documentos\GitHub\java-gen"/>
+    <property name="java.vm.compressedOopsMode" value="Zero based"/>
     <property name="line.separator" value="&#10;"/>
-    <property name="java.specification.name" value="Java Platform API Specification"/>
     <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
-    <property name="java.awt.graphicsenv" value="sun.awt.X11GraphicsEnvironment"/>
-    <property name="surefire.real.class.path" value="/home/attory/Documents/Github/java-gen/target/surefire/surefirebooter15107642236090279134.jar"/>
+    <property name="java.specification.name" value="Java Platform API Specification"/>
+    <property name="surefire.real.class.path" value="C:\Users\joao_\AppData\Local\Temp\surefire3163389907786216534\surefirebooter333542878316881617.jar"/>
+    <property name="user.script" value=""/>
     <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
-    <property name="java.runtime.version" value="11.0.14+8"/>
-    <property name="user.name" value="attory"/>
-    <property name="path.separator" value=":"/>
-    <property name="os.version" value="5.15.0-50-generic"/>
-    <property name="java.runtime.name" value="OpenJDK Runtime Environment"/>
+    <property name="java.runtime.version" value="20+36-2344"/>
+    <property name="user.name" value="joao_"/>
+    <property name="stdout.encoding" value="Cp1252"/>
+    <property name="path.separator" value=";"/>
+    <property name="os.version" value="10.0"/>
+    <property name="java.runtime.name" value="Java(TM) SE Runtime Environment"/>
     <property name="file.encoding" value="UTF-8"/>
-    <property name="java.vm.name" value="OpenJDK 64-Bit Server VM"/>
-    <property name="java.vendor.version" value="18.9"/>
-    <property name="maven.ext.class.path" value="/app/netbeans/java/maven-nblib/netbeans-eventspy.jar"/>
-    <property name="localRepository" value="/home/attory/.m2/repository"/>
+    <property name="java.vm.name" value="Java HotSpot(TM) 64-Bit Server VM"/>
+    <property name="jpda.listen" value="true"/>
+    <property name="maven.ext.class.path" value="C:\Program Files\NetBeans-17\netbeans\java\maven-nblib\netbeans-eventspy.jar"/>
+    <property name="localRepository" value="C:\Users\joao_\.m2\repository"/>
     <property name="java.vendor.url.bug" value="https://bugreport.java.com/bugreport/"/>
-    <property name="java.io.tmpdir" value="/tmp"/>
-    <property name="java.version" value="11.0.14"/>
-    <property name="user.dir" value="/home/attory/Documents/Github/java-gen"/>
+    <property name="java.io.tmpdir" value="C:\Users\joao_\AppData\Local\Temp\"/>
+    <property name="java.version" value="20"/>
+    <property name="user.dir" value="C:\Users\joao_\OneDrive\Documentos\GitHub\java-gen"/>
     <property name="os.arch" value="amd64"/>
     <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
-    <property name="java.awt.printerjob" value="sun.print.PSPrinterJob"/>
-    <property name="user.language.format" value="pt"/>
-    <property name="sun.os.patch.level" value="unknown"/>
-    <property name="java.library.path" value=":/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib"/>
-    <property name="java.vm.info" value="mixed mode"/>
-    <property name="java.vendor" value="Flathub"/>
-    <property name="java.vm.version" value="11.0.14+8"/>
+    <property name="sun.os.patch.level" value=""/>
+    <property name="native.encoding" value="Cp1252"/>
+    <property name="java.library.path" value="C:\Program Files\Java\jdk-20\bin;C:\WINDOWS\Sun\Java\bin;C:\WINDOWS\system32;C:\WINDOWS;C:\Python311\Scripts\;C:\Python311\;C:\Program Files\Eclipse Adoptium\jdk-17.0.6.10-hotspot\bin;C:\Program Files\Common Files\Oracle\Java\javapath;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\NVIDIA Corporation\NVIDIA NvDLISR;C:\Program Files\Git\cmd;C:\Program Files\nodejs\;C:\ProgramData\chocolatey\bin;C:\Users\joao_\AppData\Local\Microsoft\WindowsApps;C:\Users\joao_\AppData\Local\GitHubDesktop\bin;C:\Users\joao_\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\joao_\OneDrive\Área de Trabalho\apache-maven-3.9.1\bin;;C:\Users\joao_\AppData\Local\Programs\Microsoft VS Code Insiders\bin;C:\Users\joao_\AppData\Roaming\npm;."/>
+    <property name="java.vm.info" value="mixed mode, sharing"/>
+    <property name="stderr.encoding" value="Cp1252"/>
+    <property name="java.vendor" value="Oracle Corporation"/>
+    <property name="java.vm.version" value="20+36-2344"/>
     <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
-    <property name="java.class.version" value="55.0"/>
+    <property name="java.class.version" value="64.0"/>
+    <property name="maven.surefire.debug" value="-agentlib:jdwp=transport=dt_socket,server=n,address=49872"/>
   </properties>
-  <testcase name="checkGenList" classname="br.edu.ifsc.javargtest.MainTests" time="0.333"/>
+  <testcase name="checkGenAttributeAccess" classname="br.edu.ifsc.javargtest.MainTests" time="0.242"/>
 </testsuite>

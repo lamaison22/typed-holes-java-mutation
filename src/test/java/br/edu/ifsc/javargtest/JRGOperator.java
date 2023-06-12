@@ -1,5 +1,7 @@
 package br.edu.ifsc.javargtest;
 
+import com.github.javaparser.JavaParser;
+import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.expr.BinaryExpr;
 import com.github.javaparser.ast.expr.Expression;
@@ -9,10 +11,14 @@ import com.github.javaparser.ast.expr.UnaryExpr;
 import com.github.javaparser.ast.expr.VariableDeclarationExpr;
 import com.github.javaparser.ast.type.PrimitiveType;
 import com.github.javaparser.ast.type.Type;
+
+import java.util.Iterator;
 import java.util.Map;
 import net.jqwik.api.Arbitraries;
 import net.jqwik.api.Arbitrary;
 import net.jqwik.api.Provide;
+import net.jqwik.api.Arbitrary.ArbitraryFacade;
+import net.jqwik.api.arbitraries.IteratorArbitrary;
 
 /**
  * 
@@ -25,6 +31,7 @@ public class JRGOperator {
   private JRGBase mBase;
 
   private JRGCore mCore;
+
 
   public JRGOperator(ClassTable ct, JRGBase base, JRGCore core) {
     mCT = ct;
@@ -67,6 +74,10 @@ public class JRGOperator {
       ReflectParserTranslator.reflectToParserType(t.toString())
     );
 
+    //aqui gera a expressao binária, agr pq o exp é igual ao ex é a questao
+    //pelo menos quando são dois numeros
+    String salame= e.sample().toString();
+    System.out.println("salamaleiko \n" +salame);
     return e.map(
       exp -> new BinaryExpr(exp, ex.sample(), genArithOperator().sample())
     );
@@ -156,7 +167,7 @@ public class JRGOperator {
   //Ma
   public Arbitrary<BinaryExpr.Operator> genArithOperator() {
     return Arbitraries.of(
-      BinaryExpr.Operator.EQUALS,
+      // BinaryExpr.Operator.EQUALS,
       BinaryExpr.Operator.MULTIPLY,
       BinaryExpr.Operator.MINUS,
       BinaryExpr.Operator.PLUS,
