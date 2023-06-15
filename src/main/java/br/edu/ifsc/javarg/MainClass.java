@@ -5,6 +5,8 @@ import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.VariableDeclarator;
+import com.github.javaparser.ast.expr.Expression;
+import com.github.javaparser.ast.expr.LiteralExpr;
 import com.github.javaparser.ast.expr.VariableDeclarationExpr;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.ast.visitor.ModifierVisitor;
@@ -20,6 +22,7 @@ import br.edu.ifsc.javargexamples.C;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.github.javaparser.JavaParser;
@@ -36,6 +39,169 @@ import com.github.javaparser.StaticJavaParser;
 public class MainClass {
 
   public static void main(String[] args) {
+
+//         String sourceCode = "public class MyClass {\n" +
+//                             "    public static void main(String[] args) {\n" +
+//                             "        int cc =?35?;\n" +
+//                             "        System.out.println(cc);\n" +
+//                             "    }\n" +
+//                             "}";
+
+//         CompilationUnit compilationUnit = StaticJavaParser.parse(sourceCode);
+
+//         ReflectionTypeSolver typeSolver = new ReflectionTypeSolver();
+//         JavaSymbolSolver symbolSolver = new JavaSymbolSolver(typeSolver);
+//         StaticJavaParser.getConfiguration().setSymbolResolver(symbolSolver);
+
+//         compilationUnit.findAll(VariableDeclarator.class).forEach(variableDeclarator -> {
+//             if (variableDeclarator.getNameAsString().equals("cc")) {
+//                 if (variableDeclarator.getType().isPrimitiveType()) {
+//                     Expression initializer = variableDeclarator.getInitializer().orElse(null);
+//                     if (initializer instanceof LiteralExpr) {
+//                         LiteralExpr literalExpr = (LiteralExpr) initializer;
+//                         String markedValue = "?" + getLiteralValueAsString(literalExpr) + "?";
+//                         String replacementValue = "42";  // Substitua pelo valor desejado
+
+//                         variableDeclarator.setInitializer(replaceMarkedValue(literalExpr, markedValue, replacementValue));
+//                     }
+//                 }
+//             }
+//         });
+
+//         System.out.println(compilationUnit.toString());
+//     }
+  
+//     public static String getLiteralValueAsString(LiteralExpr literalExpr) {
+//         if (literalExpr.isBooleanLiteralExpr()) {
+//             return Boolean.toString(literalExpr.asBooleanLiteralExpr().getValue());
+//         } else if (literalExpr.isDoubleLiteralExpr()) {
+//             return Double.toString(literalExpr.asDoubleLiteralExpr().asDouble());
+//         } else if (literalExpr.isIntegerLiteralExpr()) {
+//             return Integer.toString(literalExpr.asIntegerLiteralExpr().asInt());
+//         } else if (literalExpr.isLongLiteralExpr()) {
+//             return Long.toString(literalExpr.asLongLiteralExpr().asLong());
+//         } else if (literalExpr.isNullLiteralExpr()) {
+//             return "null";
+//         } else if (literalExpr.isStringLiteralExpr()) {
+//             return literalExpr.asStringLiteralExpr().asString();
+//         } else {
+//             return "";
+//         }
+//     }
+
+//     public static String replaceMarkedValue(LiteralExpr literalExpr, String markedValue, String replacementValue) {
+//         String valueType = literalExpr.calculateResolvedType().describe();
+
+//         switch (valueType) {
+//             case "int":
+//                 return replacementValue;
+//             case "long":
+//                 return replacementValue + "L";
+//             case "float":
+//                 return replacementValue + "f";
+//             case "double":
+//                 return replacementValue + "d";
+//             case "char":
+//                 return "'" + replacementValue.charAt(0) + "'";
+//             case "boolean":
+//                 return Boolean.parseBoolean(replacementValue) ? "true" : "false";
+//             default:
+//                 return markedValue;
+//         }
+//     }
+// }
+        String sourceCode = "public class MyClass {\n" +
+                "    public static void main(String[] args) {\n" +
+                "        int cc = ?36?;\n" +
+                "        System.out.println(cc);\n" +
+                "    }\n" +
+                "}";
+
+        CompilationUnit compilationUnit = StaticJavaParser.parse(sourceCode);
+
+        ReflectionTypeSolver typeSolver = new ReflectionTypeSolver();
+        JavaSymbolSolver symbolSolver = new JavaSymbolSolver(typeSolver);
+        StaticJavaParser.getConfiguration().setSymbolResolver(symbolSolver);
+
+        compilationUnit.findAll(VariableDeclarator.class).forEach(variableDeclarator -> {
+            if (variableDeclarator.getNameAsString().equals("cc")) {
+                if (variableDeclarator.getType().isPrimitiveType()) {
+                    Expression initializer = variableDeclarator.getInitializer().orElse(null);
+                    if (initializer instanceof LiteralExpr) {
+                        LiteralExpr literalExpr = (LiteralExpr) initializer;
+                        String markedValue = getMarkedValue(literalExpr);
+                        String replacementValue = "42";  // Substitua pelo valor desejado do mesmo tipo
+
+                        String valueType = literalExpr.calculateResolvedType().describe();
+                        String replacementCode = getReplacementCode(valueType, replacementValue);
+
+                        VariableDeclarationExpr declarationExpr = variableDeclarator.findAncestor(VariableDeclarationExpr.class).orElse(null);
+                        if (declarationExpr != null) {
+                            declarationExpr.replace(literalExpr, StaticJavaParser.parseExpression(replacementCode));
+                        }
+                    }
+                }
+            }
+        });
+
+        System.out.println(compilationUnit.toString());
+    }
+
+    private static String getMarkedValue(LiteralExpr literalExpr) {
+        String value = literalExpr.toString();
+        Pattern pattern = Pattern.compile("\\?(.*?)\\?");
+        Matcher matcher = pattern.matcher(value);
+        if (matcher.find()) {
+            return matcher.group(1);
+        }
+        return null;
+    }
+
+    private static String getReplacementCode(String valueType, String replacementValue) {
+        switch (valueType) {
+            case "int":
+                return replacementValue;
+            case "long":
+                return replacementValue + "L";
+            case "float":
+                return replacementValue + "f";
+            case "double":
+                return replacementValue + "d";
+            case "char":
+                return "'" + replacementValue.charAt(0) + "'";
+            case "boolean":
+                return Boolean.parseBoolean(replacementValue) ? "true" : "false";
+            default:
+                return "";
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 //     String sourceCode = "public class MyClass {\n" +
@@ -93,44 +259,41 @@ public class MainClass {
 // }
 // });
 
- String sourceCode = "public class MyClass {\n" +
-                            "    public static void main(String[] args) {\n" +
-                            "        ?object? cc = 35;\n" +
-                            "        System.out.println(cc);\n" +
-                            "    }\n" +
-                            "}";
+//----------------------------------o melhorzinho----------------------------------------------------------
+//  String sourceCode = "public class MyClass {\n" +
+//                             "    public static void main(String[] args) {\n" +
+//                             "        ?object? cc = 35;\n" +
+//                             "        System.out.println(cc);\n" +
+//                             "    }\n" +
+//                             "}";
 
 
-        //passa o codigo pro método que vai concatenar os ? no tipo já passando qual o tipo e pra oq trocar                                
-        String modifiedCode = replaceMarkedType(sourceCode, "object", "double");
-        //configuração da C.U e solvers, tem q usar o StaticJavaParser, o outro nao funciona aparentemente
-        //instancia uma c.u e passa o codigo modificado que retornará
-        CompilationUnit compilationUnit = StaticJavaParser.parse(modifiedCode);
-        //configura os solvers
-        ReflectionTypeSolver typeSolver = new ReflectionTypeSolver();
-        JavaSymbolSolver symbolSolver = new JavaSymbolSolver(typeSolver);
-        StaticJavaParser.getConfiguration().setSymbolResolver(symbolSolver);
-        //aqui ele percorre procurando o objeto "cc" e testa se acha o tipo q a gente tem q passar e dps muda
-        compilationUnit.findAll(VariableDeclarator.class).forEach(variableDeclarator -> {
-            if (variableDeclarator.getNameAsString().equals("cc")) {
-                if (variableDeclarator.getType().isPrimitiveType() &&
-                        variableDeclarator.getType().asPrimitiveType().getType().asString().equals("object")) {
-                    variableDeclarator.setType(StaticJavaParser.parseType("double"));
-                }
-            }
-        });
+//         //passa o codigo pro método que vai concatenar os ? no tipo já passando qual o tipo e pra oq trocar                                
+//         String modifiedCode = replaceMarkedType(sourceCode,"object","double");
+//         //configuração da C.U e solvers, tem q usar o StaticJavaParser, o outro nao funciona aparentemente
+//         //instancia uma c.u e passa o codigo modificado que retornará
+//         CompilationUnit compilationUnit = StaticJavaParser.parse(modifiedCode);
+//         //configura os solvers
+//         ReflectionTypeSolver typeSolver = new ReflectionTypeSolver();
+//         JavaSymbolSolver symbolSolver = new JavaSymbolSolver(typeSolver);
+//         StaticJavaParser.getConfiguration().setSymbolResolver(symbolSolver);
+//         //aqui ele percorre procurando o objeto "cc" e testa se acha o tipo q a gente tem q passar e dps muda
+//         compilationUnit.findAll(VariableDeclarator.class).forEach(variableDeclarator -> {
+//             if (variableDeclarator.getNameAsString().equals("cc")) {
+//                 if (variableDeclarator.getType().isPrimitiveType() &&
+//                         variableDeclarator.getType().asPrimitiveType().getType().asString().equals("object")) {
+//                     variableDeclarator.setType(StaticJavaParser.parseType("double"));
+//                 }
+//             }
+//         });
 
-        System.out.println(compilationUnit.toString());
-    }
-    // concatena o tipo com as macações ? para que possa ser trocado
-    public static String replaceMarkedType(String code, String markedType, String replacementType) {
-        String pattern = "\\?" + Pattern.quote(markedType) + "\\?";
-        return code.replaceAll(pattern, replacementType);
-    }
-}
+//         System.out.println(compilationUnit.toString());
+//     }
+//     // concatena o tipo com as macações ? para que possa ser trocado
+//     public static String replaceMarkedType(String code, String markedType, String replacementType) {
 
 
-
-   
-
-
+//         String pattern = "\\?" + Pattern.quote(markedType) + "\\?";
+//         return code.replaceAll(pattern, replacementType);
+//     }
+// }
