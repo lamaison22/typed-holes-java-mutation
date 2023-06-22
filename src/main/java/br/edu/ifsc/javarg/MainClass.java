@@ -302,7 +302,7 @@ public class MainClass {
 //  }
 
 String code = "public class Exemplo {\n" +
-                "    ?int? num = 0;\n" +
+                "    int num = ?int?;\n" +
                 "    ?String? name = \"Joao\";\n" +
                 "    ?double? value = 3.14;\n" +
                 "}";
