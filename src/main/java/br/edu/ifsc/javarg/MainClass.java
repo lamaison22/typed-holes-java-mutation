@@ -301,30 +301,59 @@ public class MainClass {
 //      }
 //  }
 
-String code = "public class Exemplo {\n" +
-                "    int num = ?int?;\n" +
-                "    ?String? name = \"Joao\";\n" +
-                "    ?double? value = 3.14;\n" +
-                "}";
+    String code = "public class Exemplo {\n" +
+    "    int num = ?int?;\n" +
+    "    String name = ?String?;\n" +
+    "    ?double? value = 3.14;\n" +
+    "}";
 
         List<String> types = extractTypes(code);
         System.out.println("Tipos encontrados:");
-        for (String type : types) {
-            System.out.println(type);
-        }
-    }
-
-    public static List<String> extractTypes(String code) {
-        List<String> types = new ArrayList<>();
-        Pattern pattern = Pattern.compile("\\?(.*?)\\?");
-        Matcher matcher = pattern.matcher(code);
-
-        while (matcher.find()) {
-            String type = matcher.group(1).trim();
-            types.add(type);
+            for (String type : types) {
+                System.out.println(type);
         }
 
-        return types;
+        code = replaceTypes(code, types);
+        System.out.println("Código com substituição:");
+        System.out.println(code);
     }
-  }
+
+public static List<String> extractTypes(String code) {          //obtenho os tipos marcados
+    List<String> types = new ArrayList<>();
+    Pattern pattern = Pattern.compile("\\?(.*?)\\?");
+    Matcher matcher = pattern.matcher(code);
+
+    while (matcher.find()) {
+        String type = matcher.group(1).trim();
+        types.add(type);
+    }
+
+    return types;
+    }
+
+public static String replaceTypes(String code, List<String> types) { //passo o codigo e a lista de tipos
+    for (String type : types) {
+        String value = getReplacementValue(type);  //chama o metodo que vai substituir com base no tipo
+        code = code.replace("?" + type + "?", value);
+    }
+    return code;
+    }
+
+public static String getReplacementValue(String type) { //verifica o tipo e retorna, se eu quiser usar os Gens vou ter q por .toString() a principio
+    switch (type) {
+    case "int":
+    return "42";
+
+    case "String":
+    return "Substituicao";
+
+    case "double":
+    return "3.14159";
+    // Adicionar mais casos para outros tipos, se necessário
+    default:
+    return "null";
+    }
+
+    }
+}
 
