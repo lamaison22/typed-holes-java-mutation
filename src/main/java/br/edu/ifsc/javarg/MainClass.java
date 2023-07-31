@@ -6,6 +6,7 @@ import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.expr.Expression;
+import com.github.javaparser.ast.expr.IntegerLiteralExpr;
 import com.github.javaparser.ast.expr.LiteralExpr;
 import com.github.javaparser.ast.expr.VariableDeclarationExpr;
 import com.github.javaparser.ast.type.Type;
@@ -329,7 +330,7 @@ public static List<String> extractTypes(String code) {          //obtenho os tip
     }
 
     return types;
-    }
+}
 
 public static String replaceTypes(String code, List<String> types) { //passo o codigo e a lista de tipos
     for (String type : types) {
@@ -341,18 +342,23 @@ public static String replaceTypes(String code, List<String> types) { //passo o c
 
 public static String getReplacementValue(String type) { //verifica o tipo e retorna, se eu quiser usar os Gens vou ter q por .toString() a principio
     switch (type) {
-    case "int":
-    return "42";
+        case "int":
+        return "42";
+        // case INT:    Esse é o genInt mas como funcionaria com arbitraries...?
+        //     return Arbitraries
+        //       .integers()
+        //       .map(i -> new IntegerLiteralExpr(String.valueOf(i)));
 
-    case "String":
-    return "Substituicao";
+        case "String":
+        return "Substituicao";
+        //return genPrimitiveString()
 
-    case "double":
-    return "3.14159";
-    // Adicionar mais casos para outros tipos, se necessário
-    default:
-    return "null";
-    }
+        case "double":
+        return "3.14159";
+        // Adicionar mais casos para outros tipos, se necessário
+        default:
+        return "null";
+        }
 
     }
 }
