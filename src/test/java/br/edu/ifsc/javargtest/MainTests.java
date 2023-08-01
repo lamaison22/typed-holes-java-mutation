@@ -87,12 +87,17 @@ public class MainTests {
     return list;
   }
 
+
+  
+
   /*
    * 
    * Write AST - Arbitrary Sintax Tree to file
    * using FileWriter output filename is `ast.dot`
    * 
    */
+
+   
   private void dumpAST() throws IOException {
     DotPrinter printer = new DotPrinter(true);
 
@@ -203,6 +208,21 @@ public class MainTests {
 
     return true;
   }
+
+    @Property(tries=2)
+     void chamaReplacer(){
+
+      String code = "public class Exemplo {\n" +
+      "    int num = ?int?;\n" +
+      "    String name = ?String?;\n" +
+      "    ?double? value = 3.14;\n" +
+      "}";
+
+      // String codigo= checkGenExpression().toString();
+      CodeReplacer sla = new CodeReplacer(mCore, mCtx );
+      sla.replaceCodigo(code);
+
+}
 
   /*
    *
