@@ -271,7 +271,7 @@ public class JRGStmt {
   }
 
   @Provide
-  public Arbitrary<IfStmt> genIfStmt(Map<String, String> ctx) {
+  public Arbitrary<IfStmt> genIfStmt(Map<String, String> ctx) throws ClassNotFoundException {
     JRGLog.showMessage(JRGLog.Severity.MSG_XDEBUG, "genIfStmt::inicio");
 
     Map<String, String> newCtxIf = new HashMap<String, String>(ctx);
@@ -295,7 +295,7 @@ public class JRGStmt {
   }
 
   @Provide
-  public Arbitrary<WhileStmt> genWhileStmt(Map<String, String> ctx) {
+  public Arbitrary<WhileStmt> genWhileStmt(Map<String, String> ctx) throws ClassNotFoundException{
     JRGLog.showMessage(JRGLog.Severity.MSG_XDEBUG, "genWhileStmt::inicio");
 
     Map<String, String> newCtx = new HashMap<String, String>(ctx);
@@ -316,7 +316,7 @@ public class JRGStmt {
   }
 
   @Provide
-  public Arbitrary<ExpressionStmt> genExpressionStmt(Map<String, String> ctx) {
+  public Arbitrary<ExpressionStmt> genExpressionStmt(Map<String, String> ctx) throws ClassNotFoundException{
     //@TODO: Sortear o tipo aleatoriamente e passar para genExpression
     Arbitrary<PrimitiveType.Primitive> t = mBase.primitiveTypes();
 
@@ -351,7 +351,6 @@ public class JRGStmt {
   public Arbitrary<ForStmt> genForStmt(Map<String, String> ctx)
     throws ClassNotFoundException {
     JRGLog.showMessage(JRGLog.Severity.MSG_XDEBUG, "genForStmt::inicio");
-
     Arbitrary<VariableDeclarationExpr> variableD = genVarDeclAssignInt(ctx);
 
     VariableDeclarationExpr variable = variableD.sample();
@@ -368,7 +367,6 @@ public class JRGStmt {
 
     Map<String, String> newCtx = new HashMap<String, String>(ctx);
 
-    System.out.println(variable.getVariable(0));
 
     Arbitrary<Expression> compare = mCore.genExpressionOperatorFor(
       newCtx,

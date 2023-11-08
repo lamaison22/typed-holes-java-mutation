@@ -1,7 +1,5 @@
 package br.edu.ifsc.javargtest;
 
-import com.github.javaparser.JavaParser;
-import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.expr.BinaryExpr;
 import com.github.javaparser.ast.expr.Expression;
@@ -11,14 +9,10 @@ import com.github.javaparser.ast.expr.UnaryExpr;
 import com.github.javaparser.ast.expr.VariableDeclarationExpr;
 import com.github.javaparser.ast.type.PrimitiveType;
 import com.github.javaparser.ast.type.Type;
-
-import java.util.Iterator;
 import java.util.Map;
 import net.jqwik.api.Arbitraries;
 import net.jqwik.api.Arbitrary;
 import net.jqwik.api.Provide;
-import net.jqwik.api.Arbitrary.ArbitraryFacade;
-import net.jqwik.api.arbitraries.IteratorArbitrary;
 
 /**
  * 
@@ -32,7 +26,6 @@ public class JRGOperator {
 
   private JRGCore mCore;
 
-
   public JRGOperator(ClassTable ct, JRGBase base, JRGCore core) {
     mCT = ct;
 
@@ -42,7 +35,7 @@ public class JRGOperator {
   }
 
   @Provide
-  public Arbitrary<BinaryExpr> genLogiExpression(Map<String, String> ctx) {
+  public Arbitrary<BinaryExpr> genLogiExpression(Map<String, String> ctx) throws ClassNotFoundException {
     Arbitrary<Expression> e = mCore.genExpression(
       ctx,
       PrimitiveType.booleanType()
@@ -62,7 +55,8 @@ public class JRGOperator {
   public Arbitrary<BinaryExpr> genArithExpression(
     Map<String, String> ctx,
     Type t
-  ) {
+  ) throws ClassNotFoundException {
+    //String tp = t.asString();
 
     Arbitrary<Expression> e = mCore.genExpression(
       ctx,
@@ -74,10 +68,6 @@ public class JRGOperator {
       ReflectParserTranslator.reflectToParserType(t.toString())
     );
 
-    //aqui gera a expressao binária, agr pq o exp é igual ao ex é a questao
-    //pelo menos quando são dois numeros
-    String salame= e.sample().toString();
-    System.out.println("salamaleiko \n" +salame);
     return e.map(
       exp -> new BinaryExpr(exp, ex.sample(), genArithOperator().sample())
     );
@@ -88,7 +78,7 @@ public class JRGOperator {
     Map<String, String> ctx,
     VariableDeclarator var,
     Arbitrary<LiteralExpr> ex
-  ) {
+  ) throws ClassNotFoundException{
     Arbitrary<PrimitiveType.Primitive> t = mBase.primitiveTypesMatematicos();
     String tp = t.sample().toString();
 
@@ -112,18 +102,20 @@ public class JRGOperator {
             Map<String,String> ctx, 
             VariableDeclarator var, 
             Arbitrary<LiteralExpr> ex
-    ) {
+    ) throws ClassNotFoundException {
          Arbitrary<PrimitiveType.Primitive> t = mBase.primitiveTypesMatematicos();
         String tp = t.sample().toString();
         
         Arbitrary<Expression> e = mCore.genExpression(ctx, ReflectParserTranslator.reflectToParserType(tp));   
                  
+       // return e.map(exp -> new BinaryExpr(var.getNameAsExpression(),e.sample(), genArithOperatorFor().sample()));
         return e.map(exp -> new UnaryExpr(var.getNameAsExpression(), genArithOperatorFor().sample()));
 
+        //binary x unary
     }
 
   @Provide
-  public Arbitrary<BinaryExpr> genRelaExpression(Map<String, String> ctx) {
+  public Arbitrary<BinaryExpr> genRelaExpression(Map<String, String> ctx) throws ClassNotFoundException {
     Arbitrary<PrimitiveType.Primitive> t = mBase.primitiveTypesMatematicos();
 
     String tp = t.sample().toString();
@@ -167,7 +159,7 @@ public class JRGOperator {
   //Ma
   public Arbitrary<BinaryExpr.Operator> genArithOperator() {
     return Arbitraries.of(
-      // BinaryExpr.Operator.EQUALS,
+//      BinaryExpr.Operator.EQUALS,
       BinaryExpr.Operator.MULTIPLY,
       BinaryExpr.Operator.MINUS,
       BinaryExpr.Operator.PLUS,
