@@ -4,7 +4,9 @@ import br.edu.ifsc.javargtest.JRGLog.Severity;
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.*;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
+import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.expr.*;
 import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.stmt.ExpressionStmt;
@@ -15,6 +17,10 @@ import com.github.javaparser.ast.stmt.WhileStmt;
 import com.github.javaparser.ast.type.*;
 import com.github.javaparser.printer.DotPrinter;
 import com.github.javaparser.printer.PrettyPrinter;
+import com.google.common.base.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 import java.io.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -26,6 +32,10 @@ import java.util.regex.Pattern;
 import net.jqwik.api.*;
 import net.jqwik.api.lifecycle.BeforeTry;
 import org.junit.Test;
+
+import com.github.javaparser.ast.body.Parameter;
+import com.github.javaparser.ast.body.TypeDeclaration;
+import com.github.javaparser.ast.nodeTypes.NodeWithParameters;
 
 /**
  *
@@ -55,7 +65,7 @@ public class MainTests {
 
         dumpAST();
 
-        // JRGLog.logLevel = Severity.MSG_XDEBUG; ////////////////////////////////
+        JRGLog.logLevel = Severity.MSG_XDEBUG; ////////////////////////////////
     }
 
     @BeforeTry
@@ -71,10 +81,188 @@ public class MainTests {
         mOperator = new JRGOperator(mCT, mBase, mCore);
 
         mCtx = new HashMap<String, String>();
+
     }
 
-    // Auxiliary methods
-    private List<String> loadImports() {
+    @Property(tries = 1)
+    public void printarImports() throws ClassNotFoundException, FileNotFoundException {
+        List<ImportDeclaration> salam = imports();
+
+        for (ImportDeclaration importDeclaration : salam) {
+            System.out.println("nome do import " + importDeclaration.getNameAsString());
+        }
+        entrarNosImports(salam);
+    }
+
+    @Property(tries = 1)
+    public void printaEssa() throws ClassNotFoundException, FileNotFoundException {
+        List<ClassOrInterfaceDeclaration> classes = mSkeleton.findAll(ClassOrInterfaceDeclaration.class);
+
+        for (ClassOrInterfaceDeclaration classDecl : classes) {
+            // Obter nome da classe
+            String className = classDecl.getNameAsString();
+            System.out.println("nome da classe nessa maldição " + className);
+            processClass(classDecl);
+        }
+    }
+
+    @Property(tries = 1)
+    public void entrarNosImports(List<ImportDeclaration> salam) throws ClassNotFoundException, FileNotFoundException {
+        String basePath = "src/main/java/";
+
+        System.out.println("Entrou no entrar nos imports");
+
+        for (ImportDeclaration importDeclaration : salam) {
+            String importPath = importDeclaration.getNameAsString().replace('.', File.separatorChar) + ".java";
+            File importFile = new File(basePath, importPath);
+
+            // Verificação de existência do arquivo
+            if (importFile.exists()) {
+                try {
+                    CompilationUnit importUnit = StaticJavaParser.parse(importFile);
+                    List<ClassOrInterfaceDeclaration> classes = importUnit.findAll(ClassOrInterfaceDeclaration.class);
+                    for (ClassOrInterfaceDeclaration classDecl : classes) {
+                        System.out.println("processando classe" + classDecl.getNameAsString());
+                        processClass(classDecl);
+                    }
+                } catch (IOException e) {
+                    System.out.println("Erro ao processar o arquivo: " + importPath);
+                    e.printStackTrace();
+                }
+            } else {
+                System.out.println("Arquivo de import não encontrado: " + importPath);
+            }
+        }
+    }
+
+    // novo imports
+    @Property(tries = 10)
+    List<ImportDeclaration> imports() throws ClassNotFoundException, FileNotFoundException {
+        mSkeleton = StaticJavaParser.parse(new File(SKELETON_PATH));
+
+        List<ClassOrInterfaceDeclaration> classes = mSkeleton.findAll(ClassOrInterfaceDeclaration.class);
+
+        for (ClassOrInterfaceDeclaration classDecl : classes) {
+            // Obter nome da classe
+            String className = classDecl.getNameAsString();
+            System.out.println("olaa ");
+
+            // Chamar método para obter métodos, variáveis, etc.
+            processClass(classDecl);
+        }
+
+        return mSkeleton.getImports();
+
+    }
+
+    private void processClass(ClassOrInterfaceDeclaration classDecl)
+            throws ClassNotFoundException, FileNotFoundException {
+        // Extrair métodos e salvar em listas
+        System.out.println("Entrou no processClass");
+        List<MethodDeclaration> methods = classDecl.getMethods();
+        List<FieldDeclaration> fields = classDecl.findAll(FieldDeclaration.class);
+        List<VariableDeclarator> allVariabless = classDecl.findAll(VariableDeclarator.class);
+        List<MethodDeclaration> allMethods = new ArrayList<>();
+        List<VariableDeclarator> allVariables = new ArrayList<>();
+        List<VariableDeclarator> allfieldVariables = new ArrayList<>();
+
+        // tentei colocar asssim pra ver se conseguia entrar nas variaveis da classe
+        for (VariableDeclarator variable : allVariabless) {
+            System.out.println("Variavel da classe: " + variable.getNameAsString());
+        }
+
+        for (MethodDeclaration method : methods) {
+
+            String className = classDecl.getNameAsString();
+            System.out.println("Nome da classe: " + className);
+
+            // Nome do método
+            String methodName = method.getNameAsString();
+            System.out.println("Nome do método: " + methodName);
+
+            String type = method.getTypeAsString();
+            System.out.println("Tipo de retorno: " + type);
+            // Parâmetros do método
+            for (FieldDeclaration field : fields) {
+                List<VariableDeclarator> fieldVariables = field.getVariables();
+                for (VariableDeclarator variable : fieldVariables) {
+                    allfieldVariables.add(variable);
+                    System.out.println("Campo da classe: " + variable.getNameAsString());
+                }
+            }
+
+            List<Parameter> parameters = method.getParameters();
+            for (Parameter parameter : parameters) {
+                System.out.println("Parâmetro: " + parameter.getNameAsString());
+                System.out.println("Tipo do parâmetro: " + parameter.getTypeAsString());
+            }
+            // Capturar campos da classe
+
+            // Corpo do método
+            BlockStmt body = method.getBody().orElse(null);
+            System.out.println("Body: " + body);
+            allMethods.add(method);
+
+            if (body != null) {
+                // Variáveis locais no método
+                System.out.println("entrou no corpo");
+                List<VariableDeclarator> variables = body.findAll(VariableDeclarator.class);
+                // Aqui você pode armazenar métodos, variáveis, etc. em coleções para uso
+                allVariables.addAll(variables);
+                for (VariableDeclarator variable : variables) {
+                    System.out.println("Variável: " + variable.getNameAsString());
+                }
+
+            }
+            replaceVariaveis(allVariables, allfieldVariables);
+        }
+    }
+
+    public void replaceVariaveis(List<VariableDeclarator> allVariables, List<VariableDeclarator> fieldVariables)
+            throws ClassNotFoundException {
+        Set<String> alreadyReplaced = new HashSet<>();
+
+        // Substituir variáveis locais
+        for (VariableDeclarator variable : allVariables) {
+            substituirVariavel(variable, alreadyReplaced);
+        }
+
+        // Substituir campos da classe
+        for (VariableDeclarator fieldVariable : fieldVariables) {
+            substituirVariavel(fieldVariable, alreadyReplaced);
+        }
+    }
+
+    // O JAVA TA SE PERDENDO QUANDO VEM UM VALOR STRING ACHO Q PQ STIRNG É UMA
+    // CLASSE E ELE É BEM DO BURRO
+    private void substituirVariavel(VariableDeclarator variable, Set<String> alreadyReplaced)
+            throws ClassNotFoundException {
+        String varName = variable.getNameAsString();
+
+        if (varName.startsWith("replace") && !alreadyReplaced.contains(varName)) {
+            // Obter o tipo da variável
+            Type type = StaticJavaParser.parseType(variable.getTypeAsString());
+
+            // Gerar expressão com base no tipo
+            Arbitrary<Expression> expressionArb = mCore.genExpression(mCtx, type);
+            Expression expression = expressionArb.sample();
+
+            // Verifique se a expressão é um literal primitivo (tipo IntegerLiteralExpr,
+            // StringLiteralExpr)
+            if (expression.isLiteralExpr()) {
+                variable.setInitializer(expression);
+                System.out.println("Variável substituída: " + varName + " = " + expression);
+            } else {
+                System.out.println("Expressão gerada não é um literal: " + expression);
+            }
+
+            // Marcar a variável como já substituída
+            alreadyReplaced.add(varName);
+        }
+    }
+
+    @Property(tries = 1)
+    public List<String> loadImports() {
         NodeList<ImportDeclaration> imports = mSkeleton.getImports();
 
         List<String> list = new ArrayList<>();
@@ -82,10 +270,56 @@ public class MainTests {
         Iterator<ImportDeclaration> it = imports.iterator();
         while (it.hasNext()) {
             ImportDeclaration i = it.next();
+            System.out.println("Import no loadImports: " + i.getName().asString());
             list.add(i.getName().asString());
         }
 
         return list;
+    }
+
+    // NOVA ABORDAGEM REPLACES SEM DECLARAR
+    public CompilationUnit processPlaceholders() throws FileNotFoundException {
+        File file = new File(SKELETON_PATH);
+        CompilationUnit compilationUnit = StaticJavaParser.parse(file);
+
+        // Obter todas as variáveis declaradas
+        List<VariableDeclarator> allVariables = compilationUnit.findAll(VariableDeclarator.class);
+
+        for (VariableDeclarator variable : allVariables) {
+            java.util.Optional<Expression> initializerOpt = variable.getInitializer();
+
+            if (initializerOpt.isPresent()) {
+                Expression initializer = initializerOpt.get();
+                System.out.println("Initializer: " + initializer);
+
+                // Percorrer subexpressões e procurar por placeholders
+                initializer.walk(expr -> {
+                    expr.walk(node -> {
+                        if (node instanceof NameExpr) {
+                            NameExpr nameExpr = (NameExpr) node;
+                            if (nameExpr.toString().startsWith("replace")) {
+                                // Gerar a nova expressão e substituir o NameExpr
+                                Arbitrary<Expression> newExpression = mCore.genExpression(mCtx, variable.getType());
+                                nameExpr.replace(newExpression.sample());
+                            }
+                        }
+                    });
+                });
+            }
+        }
+
+        return compilationUnit;
+    }
+
+    @Property(tries=1)
+    public boolean testPlaceholderSubstitution() throws FileNotFoundException {
+        CompilationUnit modifiedUnit = processPlaceholders();
+
+        // Verificar se a substituição foi realizada corretamente
+        assertNotNull(modifiedUnit); // Verifica se a unit foi carregada e modificada
+        System.out.println(modifiedUnit); // Imprimir a unidade de compilação modificada
+        return true;
+        // Aqui você pode fazer mais verificações ou rodar testes específicos
     }
 
     /*
@@ -417,7 +651,7 @@ public class MainTests {
      * from `JRGCore.java` using the given type class as a parameter
      *
      */
-    // @Example
+    @Property(tries = 1)
     boolean checkGenCandidatesConstructors() throws ClassNotFoundException {
         JRGLog.showMessage(
                 Severity.MSG_XDEBUG,
@@ -462,75 +696,78 @@ public class MainTests {
 
     @Property(tries = 20)
 
-    public void replaceCodigo() {
+    // public void replaceCodigo() {
 
-        String code = "public class Exemplo {\n" +
-                "    int num = ?int?;\n" +
-                "    String name = ?String?;\n" +
-                "    double value = ?double?;\n" +
-                "}";
+    // String code = "public class Exemplo {\n" +
+    // " int num = ?int?;\n" +
+    // " String name = ?String?;\n" +
+    // " double value = ?double?;\n" +
+    // "}";
 
-        List<String> types = extractTypes(code);
-        System.out.println("Tipos encontrados:");
-        for (String type : types) {
-            System.out.println(type);
-        }
+    // List<String> types = extractTypes(code);
+    // System.out.println("Tipos encontrados:");
+    // for (String type : types) {
+    // System.out.println(type);
+    // }
 
-        code = replaceTypes(code, types);
-        System.out.println("Codigo com substituicao:");
-        System.out.println(code);
-    }
+    // code = replaceTypes(code, types);
+    // System.out.println("Codigo com substituicao:");
+    // System.out.println(code);
+    // }
 
-    public List<String> extractTypes(String code) { // obtenho os tipos marcados
-        List<String> types = new ArrayList<>();
-        Pattern pattern = Pattern.compile("\\?(.*?)\\?");
-        Matcher matcher = pattern.matcher(code);
+    // public List<String> extractTypes(String code) { // obtenho os tipos marcados
+    // List<String> types = new ArrayList<>();
+    // Pattern pattern = Pattern.compile("\\?(.*?)\\?");
+    // Matcher matcher = pattern.matcher(code);
 
-        while (matcher.find()) {
-            String type = matcher.group(1).trim();
-            types.add(type);
-        }
+    // while (matcher.find()) {
+    // String type = matcher.group(1).trim();
+    // types.add(type);
+    // }
 
-        return types;
-    }
+    // return types;
+    // }
 
-    public String replaceTypes(String code, List<String> types) { // passo o codigo e a lista de tipos
-        for (String type : types) {
-            String value = getReplacementValue(type); // chama o metodo que vai substituir com base no tipo
-            code = code.replace("?" + type + "?", value);
-        }
-        return code;
-    }
+    // public String replaceTypes(String code, List<String> types) { // passo o
+    // codigo e a lista de tipos
+    // for (String type : types) {
+    // String value = getReplacementValue(type); // chama o metodo que vai
+    // substituir com base no tipo
+    // code = code.replace("?" + type + "?", value);
+    // }
+    // return code;
+    // }
 
-    public String getReplacementValue(String type) { // verifica o tipo e retorna, se eu quiser usar os Gens vou ter q
-                                                     // por .toString() a principio
-        switch (type) {
-            case "int":
-                Arbitrary<Expression> e = mCore.genExpression(
-                        mCtx,
-                        ReflectParserTranslator.reflectToParserType("int"));
-                String printar = e.sample().toString();
-                System.out.println("Expressao gerada: " + printar);
-                return printar.toString();
+    // public String getReplacementValue(String type) { // verifica o tipo e
+    // retorna, se eu quiser usar os Gens vou ter q
+    // // por .toString() a principio
+    // switch (type) {
+    // case "int":
+    // Arbitrary<Expression> e = mCore.genExpression(
+    // mCtx,
+    // ReflectParserTranslator.reflectToParserType("int"));
+    // String printar = e.sample().toString();
+    // System.out.println("Expressao gerada: " + printar);
+    // return printar.toString();
 
-            case "String":
-                Arbitrary<LiteralExpr> s = mBase.genPrimitiveString();
+    // case "String":
+    // Arbitrary<LiteralExpr> s = mBase.genPrimitiveString();
 
-                return s.sample().toString();
+    // return s.sample().toString();
 
-            case "double":
-                Arbitrary<Expression> doubles = mCore.genExpression(
-                        mCtx,
-                        ReflectParserTranslator.reflectToParserType("double"));
-                String printarDouble = doubles.sample().toString();
-                System.out.println("Expressao gerada double: " + printarDouble);
-                return printarDouble.toString();
-            // Adicionar mais casos para outros tipos, se necessário
-            default:
-                return "null";
-        }
+    // case "double":
+    // Arbitrary<Expression> doubles = mCore.genExpression(
+    // mCtx,
+    // ReflectParserTranslator.reflectToParserType("double"));
+    // String printarDouble = doubles.sample().toString();
+    // System.out.println("Expressao gerada double: " + printarDouble);
+    // return printarDouble.toString();
+    // // Adicionar mais casos para outros tipos, se necessário
+    // default:
+    // return "null";
+    // }
 
-    }
+    // }
 
     /*
      *

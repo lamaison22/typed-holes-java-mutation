@@ -5,6 +5,8 @@ import br.edu.ifsc.javargexamples.Aextend;
 import br.edu.ifsc.javargexamples.AextendExtend;
 import br.edu.ifsc.javargexamples.B;
 import br.edu.ifsc.javargexamples.C;
+import com.github.javaparser.StaticJavaParser;
+
 
 import java.util.function.DoubleToIntFunction;
 
@@ -40,4 +42,17 @@ public class MainClass {
       br.edu.ifsc.javargexamples.Aextend yp;
     }
   }
+
+public int testeMetodo(){
+  int assai=1;
+  // int essaquetroca= replaceTal + 1;
+  // boolean essaTrocaBool=replaceBoolers;
+  // double essaTrocaDouble=replaceDouble + 300;
+
+  int betano=20000;
+  br.edu.ifsc.javargexamples.C amazing=new br.edu.ifsc.javargexamples.C();
+  return assai;
+}
+
+
 }

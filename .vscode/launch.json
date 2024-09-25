@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "MainTests",
+            "request": "launch",
+            "mainClass": "br.edu.ifsc.javargtest.MainTests",
+            "projectName": "JavaSynthesis"
+        },
+        {
+            "type": "java",
             "name": "Current File",
             "request": "launch",
             "mainClass": "${file}"

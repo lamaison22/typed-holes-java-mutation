@@ -14,5 +14,6 @@ public class AextendExtend extends Aextend {
 
   public AextendExtend(int a1, int a2) {
     super(a1, a2);
+    int replaceValorAextendExtend =1;
   }
 }

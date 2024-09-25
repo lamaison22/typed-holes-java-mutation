@@ -12,6 +12,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 //import org.reflections.Reflections;
 
+import net.jqwik.api.Property;
+
+
 /**
  *
  * @author unknown
@@ -24,12 +27,12 @@ public class ClassTable {
     public ClassTable(List<String> imports) {
         mImports = imports;
     }
-
     public List<String> getTypes() throws ClassNotFoundException {
         List<String> list = new ArrayList<>();
 
         for (String s : mImports) {
             list.add(Class.forName(s).getName());
+            System.out.println("getTypes: " + Class.forName(s).getName());
         }
 
         return list;
