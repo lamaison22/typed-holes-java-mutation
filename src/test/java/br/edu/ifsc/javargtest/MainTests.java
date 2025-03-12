@@ -15,11 +15,27 @@ import com.github.javaparser.ast.stmt.IfStmt;
 import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.stmt.WhileStmt;
 import com.github.javaparser.ast.type.*;
+import java.lang.String;
 import com.github.javaparser.printer.DotPrinter;
 import com.github.javaparser.printer.PrettyPrinter;
-import com.google.common.base.Optional;
+import com.github.javaparser.resolution.declarations.ResolvedMethodDeclaration;
+import com.github.javaparser.resolution.types.ResolvedType;
+// import com.google.common.base.Optional;
+import com.github.javaparser.symbolsolver.JavaSymbolSolver;
+import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
+import com.github.javaparser.symbolsolver.resolution.typesolvers.JavaParserTypeSolver;
+import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+// import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.*;
 import java.lang.reflect.Constructor;
@@ -60,6 +76,11 @@ public class MainTests {
 
     private Map<String, String> mCtx;
 
+    private static final Pattern PLACEHOLDER_PATTERN = Pattern.compile("__([^_]+)__([\\w]+)"); // Regex para __tipo__nome
+
+    private Map<String, Expression> placeholderValues;
+
+
     public MainTests() throws FileNotFoundException, IOException {
         mSkeleton = StaticJavaParser.parse(new File(SKELETON_PATH));
 
@@ -81,6 +102,9 @@ public class MainTests {
         mOperator = new JRGOperator(mCT, mBase, mCore);
 
         mCtx = new HashMap<String, String>();
+
+        placeholderValues = new HashMap<>();
+
 
     }
 
@@ -270,7 +294,7 @@ public class MainTests {
         Iterator<ImportDeclaration> it = imports.iterator();
         while (it.hasNext()) {
             ImportDeclaration i = it.next();
-            System.out.println("Import no loadImports: " + i.getName().asString());
+            // System.out.println("Import no loadImports: " + i.getName().asString());
             list.add(i.getName().asString());
         }
 
@@ -278,55 +302,424 @@ public class MainTests {
     }
 
     // NOVA ABORDAGEM REPLACES SEM DECLARAR
-    public CompilationUnit processPlaceholders() throws FileNotFoundException {
-        File file = new File(SKELETON_PATH);
-        CompilationUnit compilationUnit = StaticJavaParser.parse(file);
+    // private Map<String, Expression> placeholderValues = new HashMap<>();
+    // private Map<String, List<String>> variablePlaceholderMap = new HashMap<>(); // Armazena a relação variáveis <->
+    //                                                                             // placeholders
+    // private Map<String, Expression> methodParameterPlaceholders = new HashMap<>(); // Armazena o valor do placeholder
+    //                                                                                // para parâmetros de métodos
 
-        // Obter todas as variáveis declaradas
-        List<VariableDeclarator> allVariables = compilationUnit.findAll(VariableDeclarator.class);
+    // public CompilationUnit processPlaceholders() throws FileNotFoundException {
+    //     File file = new File(SKELETON_PATH);
+    //     CompilationUnit compilationUnit = StaticJavaParser.parse(file);
 
-        for (VariableDeclarator variable : allVariables) {
-            java.util.Optional<Expression> initializerOpt = variable.getInitializer();
+    //     // Substituindo placeholders declarados no formato __Tipo__nome
+    //     List<VariableDeclarator> allVariables = compilationUnit.findAll(VariableDeclarator.class);
 
-            if (initializerOpt.isPresent()) {
-                Expression initializer = initializerOpt.get();
-                System.out.println("Initializer: " + initializer);
+    //     for (VariableDeclarator variable : allVariables) {
+    //         Optional<Expression> initializerOpt = variable.getInitializer();
 
-                // Percorrer subexpressões e procurar por placeholders
-                initializer.walk(expr -> {
-                    expr.walk(node -> {
-                        if (node instanceof NameExpr) {
-                            NameExpr nameExpr = (NameExpr) node;
-                            if (nameExpr.toString().startsWith("replace")) {
-                                // Gerar a nova expressão e substituir o NameExpr
-                                Arbitrary<Expression> newExpression = mCore.genExpression(mCtx, variable.getType());
-                                nameExpr.replace(newExpression.sample());
-                            }
-                        }
-                    });
-                });
+    //         if (initializerOpt.isPresent()) {
+    //             Expression initializer = initializerOpt.get();
+
+    //             // Verificar se o placeholder é um tipo primitivo ou qualificado
+    //             if (initializer.toString().startsWith("__")) {
+    //                 // Fazer o split no placeholder
+    //                 String[] parts = initializer.toString().split("__");
+    //                 if (parts.length == 3) {
+    //                     String tipo = parts[1];
+    //                     String nome = parts[2];
+
+    //                     // Verificar se o tipo é uma classe qualificada (iniciada com "__br")
+    //                     if (tipo.startsWith("br")) {
+    //                         // Placeholder de classe qualificada
+    //                         processClassPlaceholder(initializer, tipo, nome);
+    //                     } else {
+    //                         // Placeholder de tipo primitivo
+    //                         processPrimitivePlaceholder(initializer, tipo, nome);
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //     }
+
+    //     // Processar chamadas de método para placeholders
+    //     processMethodCalls(compilationUnit);
+
+    //     return compilationUnit;
+    // }
+
+    // private void processPrimitivePlaceholder(Expression initializer, String tipo, String nome) {
+    //     initializer.walk(expr -> {
+    //         if (expr instanceof NameExpr) {
+    //             NameExpr nameExpr = (NameExpr) expr;
+    //             String name = nameExpr.getNameAsString();
+
+    //             // Verificar se o nome segue o padrão __Tipo__nome
+    //             if (name.startsWith("__") && name.contains("__")) {
+    //                 String[] parts = name.split("__");
+    //                 if (parts.length == 3) {
+    //                     String tipoLocal = parts[1]; // O tipo é extraído do placeholder
+    //                     String nomeLocal = parts[2]; // O nome da variável
+    //                     System.out.println("Nome Local primitivo: "+nomeLocal);
+
+    //                     // Resolver o tipo de acordo com o valor do tipo
+    //                     Type javaType = StaticJavaParser.parseType(tipoLocal);
+    //                     replacePlaceholder(nameExpr, javaType, nomeLocal);
+
+    //                     // Adicionar a variável ao mapeamento de placeholders
+    //                     variablePlaceholderMap.putIfAbsent(nomeLocal, new ArrayList<>());
+    //                     variablePlaceholderMap.get(nomeLocal).add(nameExpr.toString());
+    //                 }
+    //             }
+    //         }
+    //     });
+    // }
+
+    // private void processClassPlaceholder(Expression initializer, String tipo, String nome) {
+
+    //     if (initializer.toString().contains("__")) {
+    //         System.out.println("Initializer no process"+initializer );
+    //         String[] parts = initializer.toString().split("__");
+    //         if (parts.length == 3) {
+    //             String tipoLocal = parts[1]; // O tipo é extraído do placeholder
+    //             String nomeLocal = parts[2]; // O nome da variávelvar
+    //             System.out.println("Nome Local "+nomeLocal);
+    //             System.out.println("Tipo Local "+tipoLocal);
+    //             String input = nomeLocal;  // A string completa, pode ter qualquer formato
+
+    //             // Usar uma expressão regular para capturar qualquer coisa antes de "VAR"
+    //             String pattern = "(\\w+VAR)";  // \w+ corresponde a qualquer sequência de caracteres (letras/dígitos) antes de "VAR"
+                
+    //             // Procurar a correspondência
+    //             java.util.regex.Pattern compiledPattern = java.util.regex.Pattern.compile(pattern);
+    //             java.util.regex.Matcher matcher = compiledPattern.matcher(input);
+        
+    //             if (matcher.find()) {
+    //                 String matchedVar = matcher.group(1);  // Pega a primeira correspondência que contenha "VAR"
+    //                 System.out.println("Correspondência encontrada: " + matchedVar);  // Saída: BVAR
+    //                 NameExpr nameExpr = StaticJavaParser.parseExpression(matchedVar).asNameExpr();
+
+    //             } else {
+    //                 System.out.println("Nenhuma correspondência encontrada.");
+    //             }
+    //             String gambiarraNomeTipo =  tipoLocal + " " + nomeLocal;
+
+
+    //     initializer.walk(expr -> {
+    //         if (expr instanceof NameExpr) {
+    //              NameExpr nameExpr = (NameExpr) expr;
+    //             String name = nameExpr.getNameAsString();
+    //             System.out.println("Initializer "+initializer );
+    //             System.out.println("Expr: "+expr);
+                
+
+    //             // Verificar se o nome segue o padrão __br.edu.classe__
+    //                     if(expr.toString().contains("__")){
+    //                         Type javaType = resolveType(tipoLocal); // Tipo de classe qualificada
+    //                         // NameExpr nameExpr = (NameExpr) expr;
+    //                         replacePlaceholder(nameExpr, javaType, nomeLocal);
+
+    //                         // Adicionar a variável ao mapeamento de placeholders
+    //                         variablePlaceholderMap.putIfAbsent(nomeLocal, new ArrayList<>());
+    //                         variablePlaceholderMap.get(nomeLocal).add(nameExpr.toString());
+
+    //                     }
+    //                     // Resolver o tipo da classe qualificada
+    //                 }
+    //     });
+    //         }
+    //     };
+    // }
+
+
+    // private void replacePlaceholder(NameExpr nameExpr, Type javaType, String nome) {
+    //     // Verifica se já existe um valor para o placeholder
+    //     if (placeholderValues.containsKey(nome)) {
+    //         nameExpr.replace(placeholderValues.get(nome));
+    //     } else {
+    //         // Gerar um novo valor e substituir
+    //         Arbitrary<Expression> newExpression = mCore.genExpression(mCtx, javaType);
+    //         Expression sampledExpression = newExpression.sample();
+
+    //         placeholderValues.put(nome, sampledExpression);  // Armazenar o valor gerado
+    //         nameExpr.replace(sampledExpression);  // Substituir o placeholder pela nova expressão
+    //     }
+
+    //     // Certifique-se de não incluir a expressão completa no mapa de variáveis
+    //     variablePlaceholderMap.putIfAbsent(nome, new ArrayList<>());
+    //     variablePlaceholderMap.get(nome).add(nome);  // Apenas o nome, sem a expressão completa
+    // }
+
+
+
+
+    // private Type resolveType(String tipo) {
+    //     try {
+    //         // O StaticJavaParser pode identificar o tipo diretamente
+    //         return StaticJavaParser.parseType(tipo);
+    //     } catch (Exception e) {
+    //         throw new RuntimeException("Erro ao processar o tipo: " + tipo, e);
+    //     }
+    // }
+
+    // @Property(tries = 1)
+    // public void testaEssaPorra() {
+
+    //     Arbitrary<Expression> exp = mCore.genExpression(mCtx, StaticJavaParser.parseType("int"));
+    //     System.out.println(exp.sample());
+    // }
+
+    // private Arbitrary<Expression> generateExpressionForType(Type type) {
+    //     if (type.isPrimitiveType()) {
+    //         // Para tipos primitivos, chamamos o gerador de expressões correspondente
+    //         return mCore.genExpression(mCtx, type);
+    //     } else if (type.isClassOrInterfaceType()) {
+    //         String typeName = type.asClassOrInterfaceType().getNameAsString();
+
+    //         // Se for uma String, geramos uma StringLiteralExpr
+
+    //         if (typeName.equals("String")) {
+
+    //             // Converter LiteralExpr para Expression
+    //             return mCore.genExpression(mCtx, type);
+
+    //             // return mBase.genPrimitiveString().map(expr -> (Expression) expr);
+    //             // return Arbitraries.strings().map(StringLiteralExpr::new);
+    //         }
+    //         if (typeName.equals("Expression")) {
+
+    //             // se usar object creation nao vai encontrar a classe EXPRESSION, pq ela não
+    //             // existe
+    //             // teria que criar um gerador? talvez um statement?
+    //             System.out.println(mStmt.genStatement(mCtx).sample()); // esse print da nulo
+    //             // return mCore.genObjectCreation().map(expr -> (Expression) expr);
+
+    //         }
+
+    //         // Para outros tipos de classe, criamos uma expressão de instanciamento (new
+    //         // C())
+    //         // AQUI
+    //         // return Arbitraries.just(new ObjectCreationExpr(null,
+    //         // StaticJavaParser.parseClassOrInterfaceType(typeName), NodeList.nodeList()));
+    //         try {
+    //             return mCore.genObjectCreation(mCtx, type);
+    //         } catch (ClassNotFoundException e) {
+
+    //             e.printStackTrace();
+    //         }
+    //     }
+
+    //     throw new RuntimeException("Tipo desconhecido ou não suportado: " + type);
+    // }
+
+    // private void processMethodCalls(CompilationUnit compilationUnit) {
+    //     List<MethodDeclaration> allMethods = compilationUnit.findAll(MethodDeclaration.class);
+
+    //     for (MethodDeclaration method : allMethods) {
+    //         method.walk(MethodCallExpr.class, call -> {
+    //             String methodName = call.getNameAsString();
+    //             try {
+    //                 ResolvedMethodDeclaration resolvedMethod = call.resolve();
+
+    //                 // Verificar os argumentos da chamada de método
+    //                 List<Expression> arguments = call.getArguments();
+    //                 for (int i = 0; i < arguments.size(); i++) {
+    //                     if (arguments.get(i).isNameExpr()) {
+    //                         NameExpr argExpr = arguments.get(i).asNameExpr();
+    //                         String argumentName = argExpr.getNameAsString();
+
+    //                         // Verificar se o argumento está associado a um placeholder
+    //                         for (Map.Entry<String, List<String>> entry : variablePlaceholderMap.entrySet()) {
+    //                             if (entry.getValue().contains(argumentName)) {
+    //                                 String nome = entry.getKey();
+
+    //                                 // Obter o parâmetro correto do método chamado
+    //                                 if (i < resolvedMethod.getNumberOfParams()) {
+    //                                     // Substituir o argumento do método chamado
+    //                                     String paramName = resolvedMethod.getParam(i).getName();
+
+    //                                     // Adicionar o parâmetro do método ao mapa de placeholders
+    //                                     variablePlaceholderMap.get(nome).add(paramName);
+
+    //                                     // Obter o tipo original do placeholder
+    //                                     Type tipo = StaticJavaParser.parseType(nome); // Correção aqui
+
+    //                                     // Substituir o parâmetro do método chamado pelo valor do placeholder
+    //                                     replacePlaceholder(argExpr, tipo, nome);
+    //                                 }
+    //                             }
+    //                         }
+    //                     }
+    //                 }
+    //             } catch (Exception e) {
+    //                 System.out.println("Erro ao resolver o método: " + methodName);
+    //                 e.printStackTrace();
+    //             }
+    //         });
+
+    //         // Substituir parâmetros dentro dos métodos chamados
+    //         for (Parameter parameter : method.getParameters()) {
+    //             String key = method.getNameAsString() + "#" + method.getParameters().indexOf(parameter);
+
+    //             // Se o parâmetro tem ligação com um placeholder, substitua todas as ocorrências
+    //             // dele
+    //             if (methodParameterPlaceholders.containsKey(key)) {
+    //                 method.findAll(NameExpr.class).forEach(nameExpr -> {
+    //                     if (nameExpr.getNameAsString().equals(parameter.getNameAsString())) {
+    //                         nameExpr.replace(methodParameterPlaceholders.get(key));
+    //                     }
+    //                 });
+    //             }
+    //         }
+    //     }
+    // }
+
+
+    //------------------USO DE REGEX----------------------------
+   
+
+    public CompilationUnit processPlaceholders(String filePath) throws Exception {
+        // Ler o conteúdo do arquivo como uma string
+        String fileContent = new String(Files.readAllBytes(Paths.get(filePath)));
+
+        // Substituir os placeholders diretamente no conteúdo
+        Matcher matcher = PLACEHOLDER_PATTERN.matcher(fileContent);
+        StringBuffer processedContent = new StringBuffer();
+
+        while (matcher.find()) {
+            String tipo = matcher.group(1);
+            String nome = matcher.group(2);
+
+            // Verifica se já existe um valor para o placeholder, caso contrário, gera um novo
+            if (!placeholderValues.containsKey(nome)) {
+                Type javaType = resolveType(tipo);
+                Arbitrary<Expression> newExpression = mCore.genExpression(mCtx, javaType);
+                Expression sampledExpression = newExpression.sample();
+                placeholderValues.put(nome, sampledExpression);
             }
-        }
 
-        return compilationUnit;
+            // Inserir o valor substituído no conteúdo
+            matcher.appendReplacement(processedContent, placeholderValues.get(nome).toString());
+        }
+        matcher.appendTail(processedContent);
+
+        // Parsear o conteúdo modificado para uma unidade de compilação
+        return StaticJavaParser.parse(processedContent.toString());
     }
 
-    @Property(tries=1)
-    public boolean testPlaceholderSubstitution() throws FileNotFoundException {
-        CompilationUnit modifiedUnit = processPlaceholders();
+    private Type resolveType(String tipo) {
+        // Resolver o tipo, seja ele primitivo ou uma classe complexa
+        try {
+            return StaticJavaParser.parseType(tipo);
+        } catch (Exception e) {
+            throw new RuntimeException("Tipo inválido: " + tipo);
+        }
+    }
+
+    @Property(tries = 1)
+    public boolean testPlaceholderSubstitution() throws Exception {
+        CompilationUnit modifiedUnit = processPlaceholders(SKELETON_PATH);
 
         // Verificar se a substituição foi realizada corretamente
-        assertNotNull(modifiedUnit); // Verifica se a unit foi carregada e modificada
+        // assertNotNull(modifiedUnit); // Verifica se a unit foi carregada e modificada
+
         System.out.println(modifiedUnit); // Imprimir a unidade de compilação modificada
+        saveGeneratedCode(modifiedUnit); // Salvar o código gerado em um arquivo
         return true;
-        // Aqui você pode fazer mais verificações ou rodar testes específicos
     }
 
+
+
+    // Salvar o código gerado em um arquivo
+    private static final String OUTPUT_DIRECTORY = "TestesGerados";
+    public static File saveGeneratedCode(CompilationUnit compilationUnit) throws IOException {
+        // Garantir que o diretório de saída existe
+        Path outputPath = Paths.get(OUTPUT_DIRECTORY);
+        if (!Files.exists(outputPath)) {
+            Files.createDirectory(outputPath);
+        }
+
+        // Contar o número de arquivos já presentes na pasta para gerar o próximo nome único
+        File outputDir = outputPath.toFile();
+        int fileCount = outputDir.list((dir, name) -> name.endsWith(".java")).length;
+        String fileName = "teste" + (fileCount + 1) + ".java"; // Usar o número de arquivos + 1 como próximo número
+        File outputFile = new File(outputDir, fileName);
+
+        // Escrever o código gerado no arquivo
+        try (FileWriter writer = new FileWriter(outputFile)) {
+            writer.write(compilationUnit.toString());
+        }
+
+        System.out.println("Código salvo em: " + outputFile.getAbsolutePath());
+        return outputFile;
+    }
+
+    public static boolean compileWithJavac(File file) {
+        try {
+            // ProcessBuilder processBuilder = new ProcessBuilder("javac", file.getAbsolutePath())
+            ProcessBuilder processBuilder = new ProcessBuilder(
+                    "C:\\Program Files\\Amazon Corretto\\jdk11.0.25_9\\bin\\javac",
+                    "-classpath", "src/main/java",
+                    file.getAbsolutePath());
+            
+            processBuilder.redirectErrorStream(true); // Redireciona a saída de erro para o stream de saída
+            Process process = processBuilder.start();
+
+            // Redirecionar a saída do processo para evitar que bloqueie
+            try (InputStream is = process.getInputStream()) {
+                is.transferTo(System.out); // Redireciona para a saída padrão
+            }
+
+            // Esperar que o processo termine com um limite de tempo (10 segundos)
+            boolean finished = process.waitFor(10, TimeUnit.SECONDS);
+
+            if (!finished) {
+                // Se não terminar em 10 segundos, destruir o processo
+                process.destroy();
+                System.out.println("Compilação interrompida por timeout.");
+                return false;
+            }
+
+            int exitCode = process.exitValue();
+
+            if (exitCode == 0) {
+                System.out.println("Compilação com javac bem-sucedida para " + file.getName());
+                return true;
+            } else {
+                System.out.println("Erro na compilação com javac para " + file.getName());
+                return false;
+            }
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    @Property(tries=5)
+    
+    public void TestCodeGenerationPipeline() throws Exception{
+        // 1. Processar placeholders e gerar código
+        CompilationUnit generatedCode = processPlaceholders(SKELETON_PATH);
+
+        // 2. Salvar o código gerado
+        placeholderValues.clear(); // Limpar os valores dos placeholders
+        File generatedFile = saveGeneratedCode(generatedCode);
+
+        // 3. Compilar o código gerado (sem os erros )
+        System.out.println("Compilando o código gerado sem erros...");
+        compileWithJavac(generatedFile);
+        
+    }
+
+
+
+    
+
     /*
-     * 
+     *
      * Write AST - Arbitrary Sintax Tree to file
      * using FileWriter output filename is `ast.dot`
-     * 
+     *
      */
     private void dumpAST() throws IOException {
         DotPrinter printer = new DotPrinter(true);
@@ -557,9 +950,9 @@ public class MainTests {
     }
 
     /*
-     * 
+     *
      * Generate Lambda expressions from `JRGCore.java`
-     * 
+     *
      */
     // @Example
     // @Property(tries = 10)
@@ -1132,9 +1525,9 @@ public class MainTests {
     }
 
     /*
-     * 
+     *
      * Generate statements in a array format from `JRGStmt.java`
-     * 
+     *
      */
     // @Example
     boolean checkGenStatementList() {
@@ -1150,10 +1543,10 @@ public class MainTests {
     }
 
     /*
-     * 
+     *
      * Generate statements for variable declaration
      * From `JRGStmt.java`
-     * 
+     *
      */
     // @Property(tries = 10)
     boolean checkGenVarDeclarationStmt() throws ClassNotFoundException {
@@ -1171,9 +1564,9 @@ public class MainTests {
     }
 
     /*
-     * 
+     *
      * !ERROR - empty set of values
-     * 
+     *
      */
     // @Example
     boolean checkGenVarAssingStmt() throws ClassNotFoundException {
@@ -1189,9 +1582,9 @@ public class MainTests {
     }
 
     /*
-     * 
+     *
      * !ERROR - empty set of values
-     * 
+     *
      */
     // @Example
     boolean checkGenTypeAssingStmt() throws ClassNotFoundException {
@@ -1207,10 +1600,10 @@ public class MainTests {
     }
 
     /*
-     * 
+     *
      * Generate For Loopings expressions with statements within
      * the loop using `JRGStmt.java`
-     * 
+     *
      */
     // @Example
     // @Property(tries=4)
@@ -1227,9 +1620,9 @@ public class MainTests {
     }
 
     /*
-     * 
+     *
      * !IDK = Generate a selection of variable declarations and assignments
-     * 
+     *
      */
     // @Example
     boolean checkGenList() throws ClassNotFoundException {

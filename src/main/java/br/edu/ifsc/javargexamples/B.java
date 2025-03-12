@@ -13,7 +13,7 @@ package br.edu.ifsc.javargexamples;
 public class B {
   public int b;
 
-  public B() {}
+  public B(boolean bool, boolean booleano) {}
 
   public B(int b) {
     this.b = b;

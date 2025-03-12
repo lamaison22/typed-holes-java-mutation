@@ -1,8 +1,12 @@
 package br.edu.ifsc.javargtest;
 
+import com.github.javaparser.StaticJavaParser;
+import com.github.javaparser.ast.ArrayCreationLevel;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.ast.body.VariableDeclarator;
+import com.github.javaparser.ast.expr.ArrayCreationExpr;
+import com.github.javaparser.ast.expr.ArrayInitializerExpr;
 import com.github.javaparser.ast.expr.CastExpr;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.FieldAccessExpr;
@@ -12,6 +16,7 @@ import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.NameExpr;
 import com.github.javaparser.ast.expr.ObjectCreationExpr;
 import com.github.javaparser.ast.expr.VariableDeclarationExpr;
+import com.github.javaparser.ast.type.ArrayType;
 import com.github.javaparser.ast.type.PrimitiveType;
 import com.github.javaparser.ast.type.Type;
 import java.lang.reflect.Constructor;
@@ -127,9 +132,11 @@ public class JRGCore {
     
     
     @Provide
+
   public Arbitrary<Expression> genExpression(Map<String, String> ctx, Type t) {
     Arbitrary<Expression> e;
     List<Arbitrary<Expression>> cand = new ArrayList<>();
+    
 
     try {
       if (mFuel > 0) { // Permite a recursão até certo ponto
@@ -144,6 +151,7 @@ public class JRGCore {
           );
         }
 
+        
         // Candidatos de tipos primitivos
         if (t.isPrimitiveType()) {
           cand.add(
@@ -156,10 +164,30 @@ public class JRGCore {
         }
 
         // Se não for tipo primitivo
-        if (!t.isPrimitiveType()) {
-          //Candidatos de construtores
-          cand.add(Arbitraries.oneOf(genObjectCreation(ctx, t)));
-        }
+//         if (!t.isPrimitiveType()) {
+//           //Candidatos de construtores
+//          System.out.println("tipo nao primitivo: " + t.asString());
+
+//           if (t.isArrayType()) {
+//                 ArrayType arrayType = t.asArrayType();
+//                 Type componentType = arrayType.getComponentType();  // Tipo base do array (ex: byte para byte[])
+        
+//                 // Gerar valores para o array com base no tipo dos componentes
+//                 Arbitrary<ArrayInitializerExpr> arrayInitializer = genArrayElements(ctx, componentType);
+        
+//                 // Criar a expressão de criação do array
+//                 return arrayInitializer.map(initializer ->
+//                     new ArrayCreationExpr(componentType, NodeList.nodeList(new ArrayCreationLevel()), initializer)
+//                 );
+//     }
+//             else{
+
+//                 cand.add(Arbitraries.oneOf(genObjectCreation(ctx, t)));
+//             }
+//           for (Arbitrary<Expression> arbitrary : cand) {
+//                 System.out.println("cand: "+arbitrary.toString());
+//           }
+//         }
 
         // Verifica se existem atributos candidatos
         if (!mCT.getCandidateFields(t.asString()).isEmpty()) {
@@ -188,7 +216,36 @@ public class JRGCore {
         }
 
         if (!t.isPrimitiveType()) {
-          cand.add(Arbitraries.oneOf(genObjectCreation(ctx, t)));
+        System.out.println("tipo nao primitivo: " + t.asString());
+          try{
+                if (t.isArrayType()) {
+                        ArrayType arrayType = t.asArrayType();
+                        Type componentType = arrayType.getComponentType();  // Tipo base do array (ex: byte para byte[])
+                
+                        // Gerar valores para o array com base no tipo dos componentes
+                        Arbitrary<ArrayInitializerExpr> arrayInitializer = genArrayElements(ctx, componentType);
+                
+                        // Criar a expressão de criação do array
+                        return arrayInitializer.map(initializer ->
+                            new ArrayCreationExpr(componentType, NodeList.nodeList(new ArrayCreationLevel()), initializer)
+                        );
+            }
+                    else{
+        
+                        cand.add(Arbitraries.oneOf(genObjectCreation(ctx, t)));
+                    }
+                  for (Arbitrary<Expression> arbitrary : cand) {
+                        System.out.println("cand: "+arbitrary.toString());
+                  }
+                
+                 cand.add(Arbitraries.oneOf(genObjectCreation(ctx, t)));
+                
+                
+          }      
+          catch(Exception ex){
+                System.out.println("tipo do erro: "+t.asString());
+              System.out.println("erro: "+ex.getMessage());
+          }
         }
 
         if (ctx.containsValue(t.asString())) {
@@ -206,10 +263,41 @@ public class JRGCore {
     } catch (ClassNotFoundException ex1) {
       throw new RuntimeException("Error: class not found!");
     }
-
+    
+    
     return Arbitraries.oneOf(cand);
   }
 
+
+  private Arbitrary<ArrayInitializerExpr> genArrayElements(Map<String, String> ctx, Type componentType) throws ClassNotFoundException {
+        // Tamanho fixo do array (pode ser ajustado conforme necessário)
+        int arraySize = 3;
+    
+        // Lista para armazenar os valores gerados para cada elemento do array
+        List<Arbitrary<Expression>> elementArbitraries = new ArrayList<>();
+    
+        // Gerar cada elemento do array com base no tipo dos componentes
+        for (int i = 0; i < arraySize; i++) {
+            elementArbitraries.add(genExpression(ctx, componentType));  // Chama o genExpression para cada elemento do array
+        }
+    
+        // Combinar os elementos em um ArrayInitializerExpr
+        return Arbitraries.of(elementArbitraries).map(expressionsList -> {
+            List<Expression> expressions = new ArrayList<>();
+            for (Arbitrary<Expression> arbExpr : elementArbitraries) {
+                expressions.add(arbExpr.sample());  // Coletar as amostras de cada expressão
+            }
+            return new ArrayInitializerExpr(NodeList.nodeList(expressions));  // Criar o inicializador do array
+        });
+    }
+    
+    
+    
+    
+    
+    
+    
+    
 
     
     
@@ -240,52 +328,40 @@ public class JRGCore {
 
     @Provide
     //public Arbitrary<ObjectCreationExpr> genObjectCreation(Type t) throws ClassNotFoundException {
-    public Arbitrary<Expression> genObjectCreation(
-            Map<String, String> ctx,
-            Type t
-    )
-            throws ClassNotFoundException {
-        JRGLog.showMessage(JRGLog.Severity.MSG_XDEBUG, "genObjectCreation::inicio");
-
-        List<Constructor> constrs;
-        //System.out.println("----"+t);
-        constrs = mCT.getClassConstructors(t.asString());
-        Arbitrary<Constructor> c = Arbitraries.of(constrs);
-       
-
-        Constructor constr = c.sample();
-
-        JRGLog.showMessage(
-                JRGLog.Severity.MSG_DEBUG,
-                "genObjectCreation::constr : " + constr.toString()
-        );
-
-        Class[] params = constr.getParameterTypes();
-
-        List<Class> ps = Arrays.asList(params);
-
-        JRGLog.showMessage(
-                JRGLog.Severity.MSG_DEBUG,
-                "genObjectCreation::ps " + ps
-        );
-
-        List<Type> types = ps
-                .stream()
-                .map(
-                        tname -> ReflectParserTranslator.reflectToParserType(tname.getName())
-                )
-                .collect(Collectors.toList());
-
-        JRGLog.showMessage(
-                JRGLog.Severity.MSG_DEBUG,
-                "genObjectCreation::types " + "[" + types + "]"
-        );
-
-        JRGLog.showMessage(JRGLog.Severity.MSG_XDEBUG, "genObjectCreation::fim");
-
-        return genExpressionList(ctx, types)
-                .map(el -> new ObjectCreationExpr(null, t.asClassOrInterfaceType(), el));
-    }
+        public Arbitrary<Expression> genObjectCreation(Map<String, String> ctx, Type t) throws ClassNotFoundException {
+                JRGLog.showMessage(JRGLog.Severity.MSG_XDEBUG, "genObjectCreation::inicio");
+            
+                List<Constructor> constrs = mCT.getClassConstructors(t.asString());
+                Arbitrary<Constructor> c = Arbitraries.of(constrs);
+                Constructor constr = c.sample();
+            
+                JRGLog.showMessage(JRGLog.Severity.MSG_DEBUG, "genObjectCreation::constr : " + constr.toString());
+            
+                Class[] params = constr.getParameterTypes();
+                List<Class> ps = Arrays.asList(params);
+            
+                JRGLog.showMessage(JRGLog.Severity.MSG_DEBUG, "genObjectCreation::ps " + ps);
+            
+                List<Type> types = ps
+                    .stream()
+                    .map(tname -> {
+                        if (tname.isArray()) {
+                            String elementType = tname.getComponentType().getName();
+                            return StaticJavaParser.parseType(elementType + "[]");
+                        } else {
+                            return ReflectParserTranslator.reflectToParserType(tname.getName());
+                        }
+                    })
+                    .collect(Collectors.toList());
+            
+                JRGLog.showMessage(JRGLog.Severity.MSG_DEBUG, "genObjectCreation::types " + "[" + types + "]");
+            
+                JRGLog.showMessage(JRGLog.Severity.MSG_XDEBUG, "genObjectCreation::fim");
+            
+                return genExpressionList(ctx, types)
+                    .map(el -> new ObjectCreationExpr(null, t.asClassOrInterfaceType(), el));
+            }
+            
 
     
     

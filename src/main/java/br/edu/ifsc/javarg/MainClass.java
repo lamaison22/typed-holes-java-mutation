@@ -5,10 +5,10 @@ import br.edu.ifsc.javargexamples.Aextend;
 import br.edu.ifsc.javargexamples.AextendExtend;
 import br.edu.ifsc.javargexamples.B;
 import br.edu.ifsc.javargexamples.C;
-import com.github.javaparser.StaticJavaParser;
-
-
+// import java.lang.String;
+// import java.beans.Expression;
 import java.util.function.DoubleToIntFunction;
+import java.util.function.Function;
 
 /**
  *
@@ -24,7 +24,7 @@ public class MainClass {
         if (true) {
           float qy;
         }
-        br.edu.ifsc.javargexamples.B am = new br.edu.ifsc.javargexamples.B();
+        br.edu.ifsc.javargexamples.B am = new br.edu.ifsc.javargexamples.B(false, false);
       } else {
         byte a = 1;
         short u = -107;
@@ -36,7 +36,7 @@ public class MainClass {
       }
     } else {
       int xn;
-      br.edu.ifsc.javargexamples.B kh = new br.edu.ifsc.javargexamples.B();
+      br.edu.ifsc.javargexamples.B kh = new br.edu.ifsc.javargexamples.B(true, true);
       double cb = 1.1170927842351615E188;
       boolean lf;
       br.edu.ifsc.javargexamples.Aextend yp;
@@ -45,13 +45,35 @@ public class MainClass {
 
 public int testeMetodo(){
   int assai=1;
-  // int essaquetroca= replaceTal + 1;
-  // boolean essaTrocaBool=replaceBoolers;
-  // double essaTrocaDouble=replaceDouble + 300;
+  int essaquetroca= __int__var1 + 1;
+  boolean essaTrocaBool=__boolean__boolVar;;
+  double essaTrocaDouble=__double__doubleVar + 300;
 
+  double esseRecebeOqJaExiste = __int__var1 + 2131;
+  boolean esseRecebeOqJaExisteBool = __boolean__boolVar;
+
+
+
+  br.edu.ifsc.javargexamples.B novoB = __br.edu.ifsc.javargexamples.B__BVAR;
+  br.edu.ifsc.javargexamples.B novoBdenovo = __br.edu.ifsc.javargexamples.B__BVAR;
+  br.edu.ifsc.javargexamples.C novoC = __br.edu.ifsc.javargexamples.C__CVAR;
+  br.edu.ifsc.javargexamples.A novoA = __br.edu.ifsc.javargexamples.A__AVAR ;
+
+
+
+  testePassadoParametro( __int__valorParametro,esseRecebeOqJaExisteBool);
   int betano=20000;
   br.edu.ifsc.javargexamples.C amazing=new br.edu.ifsc.javargexamples.C();
   return assai;
+}
+
+
+public void testePassadoParametro(int qualquercoisa, boolean BoolParametro ){
+  
+  boolean recebeParametro=BoolParametro;
+
+  int recebeaq=qualquercoisa;
+  System.out.println(recebeParametro);
 }
 
 
