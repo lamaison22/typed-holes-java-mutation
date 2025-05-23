@@ -69,7 +69,7 @@ A classe `MainTest` contém os métodos principais do pipeline de geração:
 
 ### 🔁 Teste em Lote
 
-- `generateAndTestMultiple(int n)`  
+- `TestCodeGenerationBatch(int n)`  
   Gera, compila e executa `n` programas automaticamente, exibindo quantos foram bem-sucedidos.
 
 ---
@@ -99,7 +99,7 @@ Para testes em massa:
 
 ```java
 @Property(tries = 1)
-public void generateAndTestMultiple() throws Exception {
+public void TestCodeGenerationBatch() throws Exception {
     int success = 0, failure = 0;
     for (int i = 1; i <= 1000; i++) {
         File generatedFile = saveGeneratedCode(processPlaceholders(SKELETON_PATH));
