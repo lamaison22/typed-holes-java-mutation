@@ -236,3 +236,10 @@ nbdist/
 .ionide
 
 # End of https://www.toptal.com/developers/gitignore/api/netbeans,java,eclipse,visualstudiocode,intellij
+# Ignorar todos os arquivos .java e .class dentro de TestesGerados
+/TestesGerados/**/*.java
+/TestesGerados/**/*.class
+
+# Manter a pasta TestesGerados e suas subpastas (sem arquivos)
+!TestesGerados/
+!TestesGerados/**/

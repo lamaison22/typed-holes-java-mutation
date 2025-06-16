@@ -76,6 +76,16 @@ public class MainTests {
 
     private Map<String, String> mCtx;
 
+    // Caminhos para os compiladores JAVA (C)ompiler
+    private static String jdkJavaCPath = "C:\\Users\\Softex\\Downloads\\graalvm-jdk-23_windows-x64_bin\\graalvm-jdk-23.0.1+11.1\\bin\\javac.exe";
+    private static String adoptiumJavCPath = "C:\\Program Files\\Eclipse Adoptium\\jdk-21.0.7.6-hotspot\\bin\\javac";
+    private static String corettoJavCPath = "C:\\Program Files\\Amazon Corretto\\jdk11.0.25_9\\bin\\javac";
+
+    // Caminho para os compiladores que executam
+    private String jdkJavaPath = "C:\\Users\\Softex\\Downloads\\graalvm-jdk-23_windows-x64_bin\\graalvm-jdk-23.0.1+11.1\\bin\\java.exe";
+    private String adoptiumJavaPath = "C:\\Program Files\\Eclipse Adoptium\\jdk-21.0.7.6-hotspot\\bin\\java.exe";
+    private String corettoJavaPath = "C:\\Program Files\\Amazon Corretto\\jdk11.0.25_9\\bin\\java.exe";
+
     private static final Pattern PLACEHOLDER_PATTERN = Pattern.compile("__([^_]+)__([\\w]+)"); // Regex para
                                                                                                // __tipo__nome
 
@@ -679,34 +689,34 @@ public class MainTests {
         return outputFile;
     }
 
-    public static boolean compileWithJavac(File file) {
+    public static boolean compileWithJavac(File file, String compilerPath) {
         try {
             ProcessBuilder processBuilder = new ProcessBuilder(
-                "C:\\Program Files\\Amazon Corretto\\jdk11.0.25_9\\bin\\javac",
-                "-classpath", "src/main/java",
-                "-d", "TestesGerados", // ⬅️ Diretório de saída para .class
-                file.getAbsolutePath()
-            );
-    
+                    compilerPath, // Caminho do compilador javac
+                    "--release", "11",
+                    "-classpath", "src/main/java",
+                    "-d", "TestesGerados", // ⬅️ Diretório de saída para .class
+                    file.getAbsolutePath());
+
             processBuilder.redirectErrorStream(true); // Redireciona a saída de erro para o stream de saída
             Process process = processBuilder.start();
-    
+
             // Redirecionar a saída do processo para evitar bloqueio
             try (InputStream is = process.getInputStream()) {
                 is.transferTo(System.out); // Redireciona para a saída padrão
             }
-    
+
             // Espera que o processo termine com limite de tempo
             boolean finished = process.waitFor(10, TimeUnit.SECONDS);
-    
+
             if (!finished) {
                 process.destroy();
                 System.out.println("Compilação interrompida por timeout.");
                 return false;
             }
-    
+
             int exitCode = process.exitValue();
-    
+
             if (exitCode == 0) {
                 System.out.println("Compilação com javac bem-sucedida para " + file.getName());
                 return true;
@@ -719,35 +729,34 @@ public class MainTests {
             return false;
         }
     }
-    
 
     // Executar a classe gerada
-    public static boolean runGeneratedClass(String fullyQualifiedClassName) {
+    public static boolean runGeneratedClass(String fullyQualifiedClassName, String compilerPath) {
         try {
             ProcessBuilder processBuilder = new ProcessBuilder(
-                "java",
-                "-cp", "TestesGerados;src/main/java",  // Inclui o caminho adicional para os .class e fontes
-                fullyQualifiedClassName  // Ex: br.edu.ifsc.javarg.MainClass_10
+                    compilerPath,
+                    "-cp", "TestesGerados;src/main/java", // Inclui o caminho adicional para os .class e fontes
+                    fullyQualifiedClassName // Ex: br.edu.ifsc.javarg.MainClass_10
             );
-    
+            System.out.println("Executando com o compilador: " + compilerPath);
             processBuilder.redirectErrorStream(true);
             Process process = processBuilder.start();
-    
+
             // Redireciona a saída para o console
             try (InputStream is = process.getInputStream()) {
                 is.transferTo(System.out);
             }
-    
+
             boolean finished = process.waitFor(10, TimeUnit.SECONDS);
-    
+
             if (!finished) {
                 process.destroy();
                 System.out.println("Execução interrompida por timeout.");
                 return false;
             }
-    
+
             int exitCode = process.exitValue();
-    
+
             if (exitCode == 0) {
                 System.out.println("Execução bem-sucedida para: " + fullyQualifiedClassName);
                 return true;
@@ -755,60 +764,124 @@ public class MainTests {
                 System.out.println("Execução falhou com código: " + exitCode);
                 return false;
             }
-    
+
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
             return false;
         }
     }
-    
 
     @Property(tries = 1)
-public void TestCodeGenerationBatch() throws Exception {
-    int successCount = 0;
-    int failureCount = 0;
+    // Sempre passar o caminho correto do compilador que quer usar
+    public void RunGeneratedClasses() throws Exception {
+        int successCount = 0;
+        int failureCount = 0;
 
-    for (int i = 1; i <= 10; i++) {
-        try {
-            System.out.println("\n=== Iteração " + i + " ===");
+        String compilerJavaCPath = jdkJavaCPath; // Escolher o compilador desejado
+        String compilerJavaPath = jdkJavaPath; // Escolher o compilador p execucao desejado
 
-            // Geração de código
-            CompilationUnit generatedCode = processPlaceholders(SKELETON_PATH);
-            placeholderValues.clear();
+        // jdk = compilou ok esqueleto 1
+        // adoptium = compilou ok esqueleto 1
+        // corretto = compilou ok esqueleto 1
+        // iteração 2
+        // jdk =
+        // adoptium =
+        // corretto =
 
-            // Salvamento com nome sequencial
-            File generatedFile = saveGeneratedCode(generatedCode); // já salva como MainClass_i.java
+        // Método para executar todas as classes geradas
+        File outputDir = new File(OUTPUT_DIRECTORY);
+        if (outputDir.exists() && outputDir.isDirectory()) {
+            File[] files = outputDir.listFiles((dir, name) -> name.endsWith(".java"));
+            if (files != null) {
+                for (File file : files) {
+                    System.out
+                            .println(
+                                    "Compilando arquivo: " + file.getName() + "com o compilador: " + compilerJavaCPath);
+                    boolean compiled = compileWithJavac(file, compilerJavaCPath);
+                    // Tira o .java para executar a classe
+                    String className = "br.edu.ifsc.javarg." + file.getName().replace(".java", "");
+                    System.out.println("Executando classe: " + className);
+                    if (compiled) {
 
-            // Compilação
-            boolean compiled = compileWithJavac(generatedFile);
+                        boolean executed = runGeneratedClass(className, compilerJavaPath);
+                        if (executed) {
+                            successCount++;
+                        } else {
+                            failureCount++;
+                            System.out.println("Falha na execução da classe: " + className);
+                        }
+                    } else {
+                        System.out.println("Falha na compilação do arquivo: " + file.getName());
+                        failureCount++;
 
-            if (!compiled) {
-                System.out.println("Falha na compilação do arquivo: " + generatedFile.getName());
-                failureCount++;
-                continue;
+                    }
+                }
+
             }
 
-            // Execução
-            String className = "br.edu.ifsc.javarg." + generatedFile.getName().replace(".java", "");
-            boolean executed = runGeneratedClass(className);
+            else
 
-            if (executed) {
-                successCount++;
-            } else {
-                failureCount++;
+            {
+                System.out.println("Nenhum arquivo .java encontrado no diretório: " + OUTPUT_DIRECTORY);
             }
-
-        } catch (Exception e) {
-            System.out.println("Erro inesperado na iteração " + i + ": " + e.getMessage());
-            failureCount++;
         }
+
+        else {
+            System.out.println("Diretório de saída não encontrado: " + OUTPUT_DIRECTORY);
+        }
+        System.out.println("\n==== RESULTADO FINAL ====");
+        System.out.println("Executados com sucesso: " + successCount);
+        System.out.println("Falhas na execução: " + failureCount);
+
     }
 
-    System.out.println("\n==== RESULTADO FINAL ====");
-    System.out.println("Executados com sucesso: " + successCount);
-    System.out.println("Falhas na execução: " + failureCount);
-}
+    @Property(tries = 1)
+    public void TestCodeGenerationBatch() throws Exception {
+        // Sempre passar o caminho correto do compilador que quer usar
+        int successCount = 0;
+        int failureCount = 0;
 
+        for (int i = 1; i <= 100; i++) {
+            try {
+                System.out.println("\n=== Iteração " + i + " ===");
+
+                // Geração de código
+                CompilationUnit generatedCode = processPlaceholders(SKELETON_PATH);
+                placeholderValues.clear();
+
+                // Salvamento com nome sequencial
+                File generatedFile = saveGeneratedCode(generatedCode); // já salva como MainClass_i.java
+
+                // Compilação
+                boolean compiled = compileWithJavac(generatedFile, corettoJavCPath); // Passar o caminho do compilador
+                // desejado
+
+                if (!compiled) {
+                    System.out.println("Falha na compilação do arquivo: " + generatedFile.getName());
+                    failureCount++;
+                    continue;
+                }
+
+                // Execução
+                String className = "br.edu.ifsc.javarg." + generatedFile.getName().replace(".java", "");
+                boolean executed = runGeneratedClass(className, corettoJavaPath);
+
+                if (executed) {
+                    successCount++;
+                } else {
+                    failureCount++;
+                }
+
+            } catch (Exception e) {
+                System.out.println("Erro inesperado na iteração " + i + ": " + e.getMessage());
+                failureCount++;
+            }
+        }
+
+        System.out.println("\n==== RESULTADO FINAL ====");
+        System.out.println("Executados com sucesso: " + successCount);
+        System.out.println("Falhas na execução: " + failureCount);
+    }
 
     @Property(tries = 1)
 
@@ -822,7 +895,7 @@ public void TestCodeGenerationBatch() throws Exception {
 
         // 3. Compilar o código gerado
         System.out.println("Compilando o código gerado sem erros...");
-        compileWithJavac(generatedFile);
+        compileWithJavac(generatedFile, adoptiumJavCPath); // Passar o caminho do compilador desejado
 
     }
 
